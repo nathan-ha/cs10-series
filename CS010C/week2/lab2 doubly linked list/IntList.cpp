@@ -1,6 +1,7 @@
 #include "IntList.h"
 #include <iostream>
 
+//create a linked list with a dummy head and tail
 IntList::IntList() : head(new IntNode(0)), tail (new IntNode(0)) {
 	head->next = tail;
 	head->prev = nullptr;
@@ -9,7 +10,7 @@ IntList::IntList() : head(new IntNode(0)), tail (new IntNode(0)) {
 }
 
 IntList::~IntList() {
-	//delete all nodes
+	//delete all nodes, including dummy nodes
 	for (IntNode* p = head; p != nullptr;) {
 		IntNode* victim = p;
 		p = p->next;
@@ -37,7 +38,7 @@ void IntList::pop_front() {
 
 void IntList::push_back(int value) {
 	IntNode* newNode = new IntNode(value);
-	//connect new node to tail and the node behind it
+	//connect new node to tail and the node next to it
 	newNode->next = tail;
 	newNode->prev = tail->prev;
 	tail->prev->next = newNode;
@@ -47,7 +48,7 @@ void IntList::push_back(int value) {
 void IntList::pop_back() {
 	if (empty()) return;
 	IntNode* victim = tail->prev;
-	//connect nodes around the last one before tail
+	//connect nodes around the node before tail
 	tail->prev->prev->next = tail;
 	tail->prev = tail->prev->prev;
 	delete victim;
@@ -57,10 +58,10 @@ bool IntList::empty() const {
 	return head->next == tail; //if there are only a head and a tail, then the list is empty
 }
 
+//output everything except head and tail
 std::ostream& operator<<(std::ostream &out, const IntList &rhs) {
 	if (rhs.empty()) return out; //return empty stream if list is empty
-	//output everything except head and tail
-	//for loop outputs every value, and adds a space after it (except the last value which is output in the line after)
+	//outputs every value, and adds a space after it (except the last value which is output in the line after)
 	for (IntNode* p = rhs.head->next; p != rhs.tail->prev; p = p->next) {
 		out << p->data << ' '; 
 	}
@@ -69,7 +70,7 @@ std::ostream& operator<<(std::ostream &out, const IntList &rhs) {
 }
 
 void IntList::printReverse() const {
-	if (empty()) return; //edge case: empty
+	if (empty()) return;
 	//prints out all node data. same logic as the operator << overload but starting from end
 	for (IntNode* p = tail->prev; p != head->next; p = p->prev) {
 		std::cout << p->data << ' ';
