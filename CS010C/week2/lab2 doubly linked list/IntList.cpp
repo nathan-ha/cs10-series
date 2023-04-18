@@ -16,6 +16,8 @@ IntList::~IntList() {
 		currNode = currNode->next;
 		delete victim;
 	}
+	head = nullptr;
+	tail = nullptr;
 }
 
 void IntList::push_front(int value) {
