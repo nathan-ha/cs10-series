@@ -1,7 +1,7 @@
 #include "IntList.h"
 #include <iostream>
 
-//create a linked list with a dummy head and tail
+//create a doubly linked list with a dummy head and tail
 IntList::IntList() : head(new IntNode(0)), tail (new IntNode(0)) {
 	head->next = tail;
 	head->prev = nullptr;
@@ -64,7 +64,7 @@ bool IntList::empty() const {
 std::ostream& operator<<(std::ostream &out, const IntList &rhs) {
 	if (rhs.empty()) return out; //return empty stream if list is empty
 	//outputs every value, and adds a space after it (except the last value which is output in the line after)
-	for (IntNode* currNode = rhs.head->next;currNode!= rhs.tail->prev; currNode = currNode->next) {
+	for (IntNode* currNode = rhs.head->next; currNode != rhs.tail->prev; currNode = currNode->next) {
 		out << currNode->data << ' '; 
 	}
 	out << rhs.tail->prev->data;
@@ -74,7 +74,7 @@ std::ostream& operator<<(std::ostream &out, const IntList &rhs) {
 void IntList::printReverse() const {
 	if (empty()) return;
 	//prints out all node data. same logic as the operator << overload but starting from end
-	for (IntNode*currNode= tail->prev; currNode!= head->next; currNode = currNode->prev) {
+	for (IntNode* currNode = tail->prev; currNode != head->next; currNode = currNode->prev) {
 		std::cout << currNode->data << ' ';
 	}
 	std::cout << head->next->data;
