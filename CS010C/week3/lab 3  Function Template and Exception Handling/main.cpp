@@ -19,27 +19,27 @@ int main() {
     vector<int> v7 = {4,2,7,2,1,7,4,2,2,0,89,5};
 
     //making this 2d vector so i can perform actions on all of the test vectors in one shot
-    vector<vector<int>> intVectors;
-    intVectors.push_back(v1);
-    intVectors.push_back(v2);
-    intVectors.push_back(v3);
-    intVectors.push_back(v4);
-    intVectors.push_back(v5);
-    intVectors.push_back(v6);
-    intVectors.push_back(v7);
+    vector<vector<int>*> intVectors;
+    intVectors.push_back(&v1);
+    intVectors.push_back(&v2);
+    intVectors.push_back(&v3);
+    intVectors.push_back(&v4);
+    intVectors.push_back(&v5);
+    intVectors.push_back(&v6);
+    intVectors.push_back(&v7);
 
     cout << "Performing tests on various vectors of ints:\n";
 
     for(auto& currVector: intVectors){
         try {
             cout << "list values before sort:\n";
-            for (auto& currElement: currVector){
+            for (auto& currElement: *currVector){
                 cout << currElement << ' ';
             }
-            cout << "\nmin index: " << min_index(currVector, 0) << '\n';
+            cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
             cout << "list values after sort:\n";
-            selection_sort(currVector);
-            for (auto& currElement: currVector){
+            selection_sort(*currVector);
+            for (auto& currElement: *currVector){
                 cout << currElement << ' ';
             }
             cout << "\n\n";
@@ -49,7 +49,46 @@ int main() {
         }
     }
 
-    //TODO: start part 2 of assignment and test vectors of other datatypes
+    //same thing as above but with strings
+    vector<string> strV1 = {"a", "b", "c", "d"};
+    vector<string> strV2;
+    vector<string> strV3 = {"\n", "\b"};
+    vector<string> strV4 = {"0"};
+    vector<string> strV5 = {"c", "b", "a"};
+    vector<string> strV6 = {"a", "a", "a", "a"};
+    vector<string> strV7 = {"dsfwe", "fifo", "doi2j0j", "a", "Zzz", "psdoi", "Aaa"};
+
+    vector<vector<string>*> stringVectors;
+    stringVectors.push_back(&strV1);
+    stringVectors.push_back(&strV2);
+    stringVectors.push_back(&strV3);
+    stringVectors.push_back(&strV4);
+    stringVectors.push_back(&strV5);
+    stringVectors.push_back(&strV6);
+    stringVectors.push_back(&strV7);
+
+    cout << "Performing tests on various vectors of strings:\n";
+
+    for(auto& currVector: stringVectors){
+        try {
+            cout << "list values before sort:\n";
+            for (auto& currElement: *currVector){
+                cout << currElement << ' ';
+            }
+            cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
+            cout << "list values after sort:\n";
+            selection_sort(*currVector);
+            for (auto& currElement: *currVector){
+                cout << currElement << ' ';
+            }
+            cout << "\n\n";
+        }
+        catch (logic_error& error) {
+            cout << "error: " << error.what() << endl;
+        }
+    }
+
+    //TODO: start part 2 of assignment
 
     return 0;
 }
