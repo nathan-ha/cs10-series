@@ -30,17 +30,17 @@ int main() {
 
     cout << "Performing tests on various vectors of ints:\n";
 
-    for(auto& vect: intVectors){
+    for(auto& currVector: intVectors){
         try {
             cout << "list values before sort:\n";
-            for (auto& element: vect){
-                cout << element << ' ';
+            for (auto& currElement: currVector){
+                cout << currElement << ' ';
             }
-            cout << "\nmin index: " << min_index(vect, 0) << '\n';
+            cout << "\nmin index: " << min_index(currVector, 0) << '\n';
             cout << "list values after sort:\n";
-            selection_sort(vect);
-            for (auto& element: vect){
-                cout << element << ' ';
+            selection_sort(currVector);
+            for (auto& currElement: currVector){
+                cout << currElement << ' ';
             }
             cout << "\n\n";
         }
