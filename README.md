@@ -1,4 +1,3 @@
 # zybooks-archive
 
-since no ones gonna see this:
- FUCK ZYBOOKS
+no ones gonna see this anyways so...FUCK ZYBOOKS
