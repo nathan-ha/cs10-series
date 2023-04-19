@@ -9,8 +9,8 @@ struct Node {
     Node* next;
 };
 
+//basically a constructor for nodes
 Node* newNode(string payload) {
-    //create a new node and set its values
     Node* newNode = new Node;
     newNode->payload = payload;
     newNode->next = nullptr;
@@ -29,13 +29,14 @@ Node* loadGame(int n, vector<string> names) {
             head = newNode(name); // initialize head specially
             prev = head;
         } else {
+            //append new node to last node
             prev->next = newNode(name);
             prev = prev->next;
         }
     }
 
     if (prev != nullptr) {
-        prev->next = head; // make circular -- last node points to head
+        prev->next = head; // makes circular -- last node points to head
     }
     return head;
 }
@@ -55,8 +56,8 @@ Node* runGame(Node* start, int k) { // josephus w circular list, k = num skips
     Node* curr = start;
     Node* prev = curr;
     while (curr->next != curr) { // exit condition, last person standing -- last node circles back to itself
-        for (int i = 0; i < k; ++i) { // find kth node
-          //move both nodes up k times
+        for (int i = 0; i < k; ++i) {
+          //move both nodes k times
           prev = curr;
           curr = curr->next;
         }
