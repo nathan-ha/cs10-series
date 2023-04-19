@@ -32,17 +32,17 @@ int main() {
 
     for(auto& currVector: intVectors){
         try {
-            cout << "list values before sort:\n";
+            cout << "list values before sort: ";
             for (auto& currElement: *currVector){
                 cout << currElement << ' ';
             }
             cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
-            cout << "list values after sort:\n";
+            cout << "list values after sort: ";
             selection_sort(*currVector);
             for (auto& currElement: *currVector){
                 cout << currElement << ' ';
             }
-            cout << "\n\n";
+            cout << "\n----------------------------------------------------\n";
         }
         catch (logic_error& exception) {
             cout << "exception: " << exception.what() << endl;
@@ -71,17 +71,17 @@ int main() {
 
     for(auto& currVector: stringVectors){
         try {
-            cout << "list values before sort:\n";
+            cout << "list values before sort: ";
             for (auto& currElement: *currVector){
                 cout << currElement << ' ';
             }
             cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
-            cout << "list values after sort:\n";
+            cout << "list values after sort: ";
             selection_sort(*currVector);
             for (auto& currElement: *currVector){
                 cout << currElement << ' ';
             }
-            cout << "\n\n";
+            cout << "\n----------------------------------------------------\n";
         }
         catch (logic_error& exception) {
             cout << "exception: " << exception.what() << endl;
