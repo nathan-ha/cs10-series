@@ -49,7 +49,7 @@ int main() {
         }
     }
 
-    //TODO: start part 2 of assignment
+    //TODO: start part 2 of assignment and test vectors of other datatypes
 
     return 0;
 }
