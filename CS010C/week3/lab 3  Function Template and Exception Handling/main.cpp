@@ -45,6 +45,44 @@ int main() {
         cout << "\n----------------------------------------------------\n";
     }
 
+    //same as above but with chars
+    cout << "Performing tests on various vectors of chars:\n";
+
+    vector<char> charV1 = {'a','b','c','d'};
+    vector<char> charV2;
+    vector<char> charV3 = {'\n', '\b', 0};
+    vector<char> charV4 = {'0'};
+    vector<char> charV5 = {'c', 'b', 'a'};
+    vector<char> charV6 = {'a', 'a', 'a', 'a'};
+    vector<char> charV7 = {'v', 'B', '1', 'V', 'c', 'z', 'z'};
+    vector<char> charV8 = {'a','B','b','c'};
+
+    vector<vector<char>*> charVectors;
+    charVectors.push_back(&charV1);
+    charVectors.push_back(&charV2);
+    charVectors.push_back(&charV3);
+    charVectors.push_back(&charV4);
+    charVectors.push_back(&charV5);
+    charVectors.push_back(&charV6);
+    charVectors.push_back(&charV7);
+    charVectors.push_back(&charV8);
+
+    cout << "Performing tests on various vectors of strings:\n";
+
+    for(auto& currVector: charVectors){
+        cout << "list values before sort: ";
+        for (auto& currElement: *currVector){
+            cout << currElement << ' ';
+        }
+        cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
+        cout << "list values after sort: ";
+        selection_sort(*currVector);
+        for (auto& currElement: *currVector){
+            cout << currElement << ' ';
+        }
+        cout << "\n----------------------------------------------------\n";
+    }
+
     //same thing as above but with strings
     vector<string> strV1 = {"a", "b", "c", "d"};
     vector<string> strV2;
@@ -137,7 +175,7 @@ T getElement(vector<T> vals, int index) {
         throw out_of_range("attemped to get element out of range");
     }
     return vals.at(index);
-}
+} 
 
 vector<char> createVector() {
     int vecSize = rand() % 26;

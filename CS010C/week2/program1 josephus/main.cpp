@@ -41,13 +41,14 @@ Node* loadGame(int n, vector<string> names) {
     return head;
 }
 
-void print(Node* start) { // prints list
+void print(Node* start) {
     Node* curr = start;
     while (curr != nullptr) {
         cout << curr->payload << endl;
         curr = curr->next;
+        //exit after iterating through whole list once
         if (curr == start) {
-            break; // exit circular list
+            break;
         }
     }
 }
@@ -60,13 +61,11 @@ Node* runGame(Node* start, int k) { // josephus w circular list, k = num skips
           //move both nodes k times
           prev = curr;
           curr = curr->next;
-        }
-
+        }   
         prev->next = curr->next; // delete kth node
         delete curr;
         curr = prev->next; //point curr back into the list
     }
-
     return curr; // last person standing
 }
 
