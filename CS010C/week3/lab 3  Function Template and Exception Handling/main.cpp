@@ -9,7 +9,7 @@ template<typename T> T getElement(vector<T> vals, int index);
 vector<char> createVector();
 
 int main() {
-    //TODO: write tests and do part B
+    //part 1: test selection sort and min index
     vector<int> v1 = {1,2,3,4,5};
     vector<int> v2;
     vector<int> v3 = {0,0,0,0};
@@ -30,23 +30,19 @@ int main() {
 
     cout << "Performing tests on various vectors of ints:\n";
 
+    //prints out vectors and performs tests 
     for(auto& currVector: intVectors){
-        try {
-            cout << "list values before sort: ";
-            for (auto& currElement: *currVector){
-                cout << currElement << ' ';
-            }
-            cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
-            cout << "list values after sort: ";
-            selection_sort(*currVector);
-            for (auto& currElement: *currVector){
-                cout << currElement << ' ';
-            }
-            cout << "\n----------------------------------------------------\n";
+        cout << "list values before sort: ";
+        for (auto& currElement: *currVector){
+            cout << currElement << ' ';
         }
-        catch (logic_error& exception) {
-            cout << "exception: " << exception.what() << endl;
+        cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
+        cout << "list values after sort: ";
+        selection_sort(*currVector);
+        for (auto& currElement: *currVector){
+            cout << currElement << ' ';
         }
+        cout << "\n----------------------------------------------------\n";
     }
 
     //same thing as above but with strings
@@ -57,6 +53,7 @@ int main() {
     vector<string> strV5 = {"c", "b", "a"};
     vector<string> strV6 = {"a", "a", "a", "a"};
     vector<string> strV7 = {"dsfwe", "fifo", "doi2j0j", "a", "Zzz", "psdoi", "Aaa"};
+    vector<string> strV8 = {"a", "z", "z", "A", "1", "n"};
 
     vector<vector<string>*> stringVectors;
     stringVectors.push_back(&strV1);
@@ -66,29 +63,24 @@ int main() {
     stringVectors.push_back(&strV5);
     stringVectors.push_back(&strV6);
     stringVectors.push_back(&strV7);
+    stringVectors.push_back(&strV8);
+
 
     cout << "Performing tests on various vectors of strings:\n";
 
     for(auto& currVector: stringVectors){
-        try {
-            cout << "list values before sort: ";
-            for (auto& currElement: *currVector){
-                cout << currElement << ' ';
-            }
-            cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
-            cout << "list values after sort: ";
-            selection_sort(*currVector);
-            for (auto& currElement: *currVector){
-                cout << currElement << ' ';
-            }
-            cout << "\n----------------------------------------------------\n";
+        cout << "list values before sort: ";
+        for (auto& currElement: *currVector){
+            cout << currElement << ' ';
         }
-        catch (logic_error& exception) {
-            cout << "exception: " << exception.what() << endl;
+        cout << "\nmin index: " << min_index(*currVector, 0) << '\n';
+        cout << "list values after sort: ";
+        selection_sort(*currVector);
+        for (auto& currElement: *currVector){
+            cout << currElement << ' ';
         }
+        cout << "\n----------------------------------------------------\n";
     }
-
-    //TODO: start part 2 of assignment
 
     //Part B
     srand(time(0));
@@ -104,7 +96,7 @@ int main() {
             cout << "Element located at " << index << ": is " << curChar << endl;
         }
         catch (out_of_range& exception) {
-            cout << "out of range exception occured\n";
+            cout << "exception: " << exception.what() << endl;
         }
     }
 
@@ -114,7 +106,7 @@ int main() {
 template<typename T>
 unsigned min_index(const vector<T> &vals, unsigned index) {
     unsigned minIndex = index;
-    //go from "index" to end
+    //only search from from "index" to end
     for (unsigned i = index; i < vals.size(); i++) {
         if (vals.at(i) < vals.at(minIndex)) {
             minIndex = i;
@@ -126,8 +118,7 @@ unsigned min_index(const vector<T> &vals, unsigned index) {
 template<typename T>
 void selection_sort(vector<T> &vals) {
     if (vals.size() <= 0) {
-        // throw logic_error("selection_sort: empty vector");
-        return; //zybooks test don't like the above line
+        return; //was debating if I should throw an exception here or not, but zybooks didn't appreciate me trying it so I decided to return instead
     }
     for (unsigned i = 0; i < vals.size() - 1; i++) {
         unsigned minIndex = min_index(vals, i);
@@ -142,6 +133,9 @@ void selection_sort(vector<T> &vals) {
 
 template<typename T> 
 T getElement(vector<T> vals, int index) {
+    if (index < 0 || static_cast<unsigned>(index) >= vals.size()) {
+        throw out_of_range("attemped to get element out of range");
+    }
     return vals.at(index);
 }
 
