@@ -14,7 +14,6 @@ Node* newNode(string payload) {
     Node* newNode = new Node;
     newNode->payload = payload;
     newNode->next = nullptr;
-
     return newNode;
 }
 
@@ -34,7 +33,6 @@ Node* loadGame(int n, vector<string> names) {
             prev = prev->next;
         }
     }
-
     if (prev != nullptr) {
         prev->next = head; // makes circular -- last node points to head
     }
@@ -62,7 +60,8 @@ Node* runGame(Node* start, int k) { // josephus w circular list, k = num skips
           prev = curr;
           curr = curr->next;
         }   
-        prev->next = curr->next; // delete kth node
+        // delete kth node
+        prev->next = curr->next;
         delete curr;
         curr = prev->next; //point curr back into the list
     }
@@ -89,6 +88,7 @@ int main() {
         cout << "error: null game" << endl;
     }
 
+    delete lastPerson;
+
     return 0;
 }
-
