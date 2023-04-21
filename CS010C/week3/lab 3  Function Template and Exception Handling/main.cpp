@@ -129,16 +129,11 @@ int main() {
     while(--numOfRuns >= 0){
         try {
             cout << "Enter a number: " << endl;
-            if (!(cin >> index)) {
-                throw runtime_error("input failed");
-            }
+            cin >> index;
             curChar = getElement(vals,index);
             cout << "Element located at " << index << ": is " << curChar << endl;
         }
         catch (out_of_range& exception) {
-            cout << "exception: " << exception.what() << endl;
-        }
-        catch (runtime_error& exception) {
             cout << "exception: " << exception.what() << endl;
         }
     }
