@@ -54,9 +54,9 @@ void print(Node* start) {
 Node* runGame(Node* start, int k) { // josephus w circular list, k = num skips
     Node* curr = start;
     Node* prev = curr;
-    while (curr->next != curr) { // exit condition, last person standing -- last node circles back to itself
+    while (curr->next != curr) { // exit condition, last person standing (last node circles back to itself)
+        //look for kth node
         for (int i = 0; i < k; ++i) {
-          //move both nodes k times
           prev = curr;
           curr = curr->next;
         }   
@@ -70,12 +70,12 @@ Node* runGame(Node* start, int k) { // josephus w circular list, k = num skips
 
 /* Driver program to test above functions */
 int main() {
-    int n=1, k=1, max; // n = num names; k = num skips (minus 1)
+    int n=1, k=1; // n = num names; k = num skips (minus 1)
     string name;
     vector<string> names;
 
     // get inputs
-    cin >> n >> k;
+    if (!(cin >> n >> k)) return 1;
     while (cin >> name && name != ".") { names.push_back(name); } // EOF or . ends input
 
     // initialize and run game
@@ -84,11 +84,10 @@ int main() {
 
     if (lastPerson != nullptr) {
         cout << lastPerson->payload << " wins!" << endl;
+        delete lastPerson;
     } else {
         cout << "error: null game" << endl;
     }
-
-    delete lastPerson;
 
     return 0;
 }
