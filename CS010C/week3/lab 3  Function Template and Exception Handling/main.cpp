@@ -127,9 +127,12 @@ int main() {
     int index;
     int numOfRuns = 10;
     while(--numOfRuns >= 0){
+        cout << "Enter a number: " << endl;
+        if (!(cin >> index)) {
+            cout << "bad input\n";
+            return 1;
+        }
         try {
-            cout << "Enter a number: " << endl;
-            cin >> index;
             curChar = getElement(vals,index);
             cout << "Element located at " << index << ": is " << curChar << endl;
         }
