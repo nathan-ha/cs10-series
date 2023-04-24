@@ -1,5 +1,6 @@
 #pragma once
 #include <stdexcept>
+#include <iostream>
 
 template <typename T>
 class stack_list {
@@ -21,6 +22,7 @@ public:
     void pop_two();
     T& top() const;
     bool empty() const;
+    void print() const;
 };
 
 
@@ -82,4 +84,14 @@ T& stack_list<T>::top() const {
     }
     return head->data;
 }
+
+template <typename T>
+void stack_list<T>::print() const {
+    for (node* i = head; i != nullptr; i = i->next) {
+        std::cout << i->data << ' ';
+    }
+    std::cout << std::endl;
+}
+
+
 
