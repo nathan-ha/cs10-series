@@ -78,7 +78,7 @@ void stack_list<T>::pop_two() {
 template <typename T>
 T& stack_list<T>::top() const {
     if (empty()) {
-        throw std::runtime_error("called top on empty stack");
+        throw std::out_of_range("called top on empty stack");
     }
     return head->data;
 }
