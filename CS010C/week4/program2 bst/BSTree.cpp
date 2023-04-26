@@ -2,7 +2,7 @@
 #include "Node.h"
 #include <string>
 
-BSTree::BSTree(): root(nullptr) {}
+BSTree::BSTree(): root_(nullptr) {}
 
 //TODO: do destructor
 BSTree::~BSTree() {
@@ -30,8 +30,8 @@ void BSTree::insert(Node* currNode, const std::string& newString) {
 }
 
 void BSTree::insert(const std::string& newString) {
-    if (root == nullptr) { //edge case: empty tree
-        root = new Node(newString);
+    if (root_ == nullptr) { //edge case: empty tree
+        root_ = new Node(newString);
     }
-    insert(root, newString);
+    insert(root_, newString);
 }

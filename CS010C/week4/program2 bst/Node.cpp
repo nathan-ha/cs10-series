@@ -1,43 +1,43 @@
 #include "Node.h"
 #include <stdexcept>
 
-Node::Node(const std::string& data): data(data), left(nullptr), right(nullptr), count(0) {}
+Node::Node(const std::string& data): data_(data), left_(nullptr), right_(nullptr), count_(0) {}
 
 void Node::setLeft(Node* newLeft) {
-    left = newLeft;
+    left_ = newLeft;
 }
 
 void Node::setRight(Node* newRight) {
-    right = newRight;
+    right_ = newRight;
 }
 
 void Node::setData(const std::string& newData) {
-    data = newData;
+    data_ = newData;
 }
 
 Node* Node::getLeft() const {
-    return left;
+    return left_;
 }
 
 Node* Node::getRight() const {
-    return right;
+    return right_;
 }
 
 const std::string& Node::getData() const {
-    return data;
+    return data_;
 }
 
 void Node::incrementCount() {
-    count++;
+    ++count_;
 }
 
 void Node::decrementCount() {
-    if (count == 0) {
-        throw std::logic_error("called DecrementCount() on Node with count=0");
+    if (count_ == 0) {
+        throw std::logic_error("called DecrementCount() on Node with count_=0");
     }
-    count--;
+    --count_;
 }
 
 int Node::getCount() const {
-    return count;
+    return count_;
 }

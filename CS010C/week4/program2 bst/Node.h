@@ -3,10 +3,10 @@
 
 class Node {
     private:
-        std::string data;
-        int count;
-        Node* left;
-        Node* right;
+        std::string data_;
+        int count_;
+        Node* left_;
+        Node* right_;
     public:
         Node(const std::string& data);
         void setLeft(Node* newLeft);

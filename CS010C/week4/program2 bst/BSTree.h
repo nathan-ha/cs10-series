@@ -4,7 +4,7 @@
 
 class BSTree {
     private:
-        Node* root;
+        Node* root_;
         //bans copies
         BSTree(const BSTree&);
         BSTree operator=(const BSTree&);
