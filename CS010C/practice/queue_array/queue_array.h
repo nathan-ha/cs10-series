@@ -35,7 +35,7 @@ queue_array<T>::~queue_array() {
 
 template <typename T>
 bool queue_array<T>::empty() const {
-    return front_ == -1 and back_ == -1;
+    return front_ == -1 && back_ == -1;
 }
 
 template <typename T>
