@@ -1,6 +1,7 @@
 #pragma once
 #include "Node.h"
 #include <string>
+#include <iostream>
 
 class BSTree {
     private:
@@ -9,10 +10,15 @@ class BSTree {
         BSTree(const BSTree&);
         BSTree operator=(const BSTree&);
         //helpers
-        void insert(Node* currNode, const std::string& newString);
+        void burnTree(Node* currNode);
+        void insert(Node* prevNode, Node* currNode, const std::string& newString);
+        void print(const Node* currNode) const;
+        bool search(Node* currNode, const std::string& target) const;
     public:
         BSTree();
         ~BSTree();
+
+        void print() const;
 
         void insert(const std::string& newString);
         void remove(const std::string& target) const;
