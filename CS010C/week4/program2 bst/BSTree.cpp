@@ -6,26 +6,26 @@
 
 BSTree::BSTree(): root_(nullptr) {}
 
-//TODO: do destructor
 BSTree::~BSTree() {
-    burnTree(root_);
+    burn(root_);
     root_ = nullptr;
 }
 
-// recursively traverses the tree and deletes everything
-void BSTree::burnTree(Node* currNode) {
+// recursively traverses the tree and deletes everything starting from smallest values
+void BSTree::burn(Node* currNode) {
     if (currNode == nullptr) return; //stop when end of path is reached
-    burnTree(currNode->getLeft());
-    burnTree(currNode->getRight());
+    burn(currNode->getLeft());
+    burn(currNode->getRight());
     delete currNode;
 }
 
+//recursively traverses the tree and prints everything out
 void BSTree::print(const Node* currNode) const {
     if (currNode == nullptr) {
         return;
     }
-    std::cout << '\"' << currNode->getData() << '\"' << " count: " << currNode->getCount() << "; ";
-    //recursively traverses the tree starting from the left (smallest) to right (biggest)
+    //traverse left subtrees and then right subtrees
+    std::cout << '\"' << currNode->getData() << "\"(" << currNode->getCount() << ") ";
     print(currNode->getLeft());
     print(currNode->getRight());
 }
@@ -39,6 +39,7 @@ void BSTree::print() const {
 }
 
 void BSTree::insert(Node* prevNode, Node* currNode, const std::string& newString) {
+    //edge case with empty tree is handled in other insert()
     if (currNode == nullptr) { //base case: found where the new node should be
         //add the node
         currNode = new Node(newString);
@@ -93,4 +94,145 @@ bool BSTree::search(const std::string& target) const {
         throw std::runtime_error("called search() on empty list");
     }
     return search(root_, target);
+}
+
+void BSTree::smallest(Node* currNode, Node*& minNode) const {
+    //go as far left through the tree as possible to find min value
+    if (currNode->getLeft() == nullptr) {
+        minNode = currNode;
+        return;
+    }
+    smallest(currNode->getLeft(), minNode);
+}
+
+const std::string& BSTree::smallest() const {
+    if (root_ == nullptr) {
+        throw std::runtime_error("called smallest() on empty list");
+    }
+    //look for smallest val and save it to smallestNode
+    Node* smallestNode;
+    smallest(root_, smallestNode);
+    return smallestNode->getData();
+}
+
+//same logic as smallest()
+void BSTree::largest(Node* currNode, Node*& maxNode) const {
+    //go as far right through the tree as possible to find max value
+    if (currNode->getRight() == nullptr) {
+        maxNode = currNode;
+        return;
+    }
+    largest(currNode->getRight(), maxNode);
+}
+
+const std::string& BSTree::largest() const {
+    if (root_ == nullptr) {
+        throw std::runtime_error("called largest() on empty list");
+    }
+    Node* largestNode;
+    largest(root_, largestNode);
+    return largestNode->getData();
+}
+
+int BSTree::height(const std::string& target, Node* currNode, int currHeight) const {
+    if (currNode == nullptr) { //base case: end of path is reached with no target found
+        return -1;
+    }
+    if (currNode->getData() == target) { //base case: target found
+        return currHeight;
+    }
+    //search through left and right subtrees until node is found or end is reached, increasing currHeight with each call
+    int leftSubTreeHeight = height(target, currNode->getLeft(), currHeight + 1);
+    if (leftSubTreeHeight != -1) { //don't return height if nothing was found
+        return leftSubTreeHeight;
+    }
+    int rightSubTreeHeight = height(target, currNode->getRight(), currHeight + 1);
+    if (rightSubTreeHeight != -1) {
+        return rightSubTreeHeight;
+    }
+    return -1;
+}
+
+int BSTree::height(const std::string& target) const {
+    if (root_ == nullptr) {
+        throw std::runtime_error("height() called on empty tree");
+    }
+    int tempHeight = 0; //i know temp is a bad name but this variable doesn't do anything but help the overload
+    int heightOfTree = height(target, root_, tempHeight);
+    if (heightOfTree == -1) {
+        throw std::runtime_error("height(): target not found");
+    }
+    return heightOfTree;
+}
+
+//traverse the tree from root to left subtree to right subtree
+void BSTree::preOrder(Node* currNode) const {
+    if (currNode == nullptr) { //base case: end of path is reached
+        return;
+    }
+    bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
+    if (!isLeaf) {
+        std::cout << currNode->getData() << "(" << currNode->getCount() << "), ";
+    } else {
+        std::cout << currNode->getData() << "(" << currNode->getCount() << ") ";
+    }
+    preOrder(currNode->getLeft());
+    preOrder(currNode->getRight());
+
+}
+
+void BSTree::preOrder() const {
+    if (root_ == nullptr) {
+        throw std::runtime_error("preOrder() called on empty tree");
+    }
+    preOrder(root_);
+    std::cout << '\n';
+}
+
+//traverse the tree from left subtree to root to right subtree
+void BSTree::inOrder(Node* currNode) const {
+    if (currNode == nullptr) { //base case: end of path is reached
+        return;
+    }
+    inOrder(currNode->getLeft());
+    bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
+    if (!isLeaf) {
+        std::cout << currNode->getData() << "(" << currNode->getCount() << "), ";
+    } else {
+        std::cout << currNode->getData() << "(" << currNode->getCount() << ") ";
+    }
+    inOrder(currNode->getRight());
+
+}
+
+void BSTree::inOrder() const {
+    if (root_ == nullptr) {
+        throw std::runtime_error("inOrder() called on empty tree");
+    }
+    inOrder(root_);
+    std::cout << '\n';
+}
+
+//traverse the tree from left subtree to right subtree to root
+void BSTree::postOrder(Node* currNode) const {
+    if (currNode == nullptr) { //base case: end of path is reached
+        return;
+    }
+    postOrder(currNode->getRight());
+    postOrder(currNode->getLeft());
+    bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
+    if (!isLeaf) {
+        std::cout << currNode->getData() << "(" << currNode->getCount() << "), ";
+    } else {
+        std::cout << currNode->getData() << "(" << currNode->getCount() << ") ";
+    }
+
+}
+
+void BSTree::postOrder() const {
+    if (root_ == nullptr) {
+        throw std::runtime_error("postOrder() called on empty tree");
+    }
+    postOrder(root_);
+    std::cout << '\n';
 }

@@ -3,9 +3,9 @@
 
 Node::Node(const std::string& data): 
     data_(data), 
+    count_(0),
     left_(nullptr), 
-    right_(nullptr), 
-    count_(0) 
+    right_(nullptr) 
 {}
 
 void Node::setLeft(Node* newLeft) {

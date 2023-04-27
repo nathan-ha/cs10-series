@@ -34,7 +34,7 @@ bool stack<T>::empty() const {
 template <typename T>
 void stack<T>::push(T val) {
     if (size_ >= MAX_SIZE) { //edge case: stack is full
-        throw std::overflow_error("Called push on full stack.");
+        throw std::overflow_error("Called push() on full stack.");
     }
     //add element to end of array
     data_[size_] = val;
@@ -44,7 +44,7 @@ void stack<T>::push(T val) {
 template<typename T>
 void stack<T>::pop() {
     if (empty()) { //edge case: stack is empty
-        throw std::out_of_range("Called pop on empty stack.");
+        throw std::out_of_range("Called pop() on empty stack.");
     }
     size_--;
 }
@@ -52,10 +52,10 @@ void stack<T>::pop() {
 template<typename T>
 void stack<T>::pop_two() {
     if (empty()) { //edge case: stack is empty
-        throw std::out_of_range("Called pop_two on empty stack.");
+        throw std::out_of_range("Called pop_two() on empty stack.");
     }
     if (size_ == 1) { //edge case: only one item in stack
-        throw std::out_of_range("Called pop_two on a stack of size 1."); 
+        throw std::out_of_range("Called pop_two() on a stack of size 1."); 
     }
     size_ -= 2;
 }
@@ -63,7 +63,7 @@ void stack<T>::pop_two() {
 template<typename T>
 T& stack<T>::top() const {
     if (empty()) { //edge case: stack is empty
-        throw std::underflow_error("Called top on empty stack.");
+        throw std::underflow_error("Called top() on empty stack.");
     }
     return data_[size_ - 1]; //returns last element of array
 }
