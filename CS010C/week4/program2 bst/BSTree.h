@@ -10,19 +10,12 @@ class BSTree {
         BSTree operator=(const BSTree&);
         //helpers
         void burn(Node* currNode);
-        void insert(Node* prevNode, Node* currNode, const std::string& newString);
         void print(const Node* currNode) const;
-        bool search(Node* currNode, const std::string& target) const;
-        void smallest(Node* currNode, Node*& minNode) const;
-        void largest(Node* currNode, Node*& maxNode) const;
-        int height(const std::string& target, Node* currNode, int currHeight) const;  
         void preOrder(Node* currNode) const;
         void inOrder(Node* currNode) const;
         void postOrder(Node* currNode) const;
         void remove(const std::string& target, Node* currNode, Node* prevNode);
-        Node* getFarRightNode(Node* currNode) const;
-        Node* getFarLeftNode(Node* currNode) const;
-        Node* findReplacement(Node* currNode) const;
+        Node* findReplacement(Node* currNode, Node*& parent) const;
     public:
         BSTree();
         ~BSTree();
