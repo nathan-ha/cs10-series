@@ -19,6 +19,10 @@ class BSTree {
         void preOrder(Node* currNode) const;
         void inOrder(Node* currNode) const;
         void postOrder(Node* currNode) const;
+        void remove(const std::string& target, Node* currNode, Node* prevNode);
+        Node* getFarRightNode(Node* currNode) const;
+        Node* getFarLeftNode(Node* currNode) const;
+        Node* findReplacement(Node* currNode) const;
     public:
         BSTree();
         ~BSTree();
@@ -26,7 +30,7 @@ class BSTree {
         void print() const; //used to test functions
 
         void insert(const std::string& newString);
-        void remove(const std::string& target) const;
+        void remove(const std::string& target);
 
         bool search(const std::string& target) const;
         const std::string& largest() const;

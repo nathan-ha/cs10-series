@@ -153,6 +153,7 @@ int BSTree::height(const std::string& target, Node* currNode, int currHeight) co
     return -1;
 }
 
+
 int BSTree::height(const std::string& target) const {
     if (root_ == nullptr) {
         throw std::runtime_error("height() called on empty tree");
@@ -164,6 +165,87 @@ int BSTree::height(const std::string& target) const {
     }
     return heightOfTree;
 }
+
+Node* BSTree::getFarRightNode(Node* currNode) const {
+    if (currNode == nullptr) {
+        throw std::runtime_error("called getFarRightNode() with nullptr");
+    }
+    if (currNode->getRight() == nullptr) {
+        return currNode;
+    }
+    return getFarRightNode(currNode->getRight());
+}
+
+Node* BSTree::getFarLeftNode(Node* currNode) const {
+    if (currNode == nullptr) {
+        throw std::runtime_error("called getFarLeftNode() with nullptr");
+    }
+    if (currNode->getLeft() == nullptr) {
+        return currNode;
+    }
+    return getFarLeftNode(currNode->getLeft());
+}
+
+Node* BSTree::findReplacement(Node* currNode) const {
+    //replacement node will be the farthest left (right) node of right (left) subtree
+    if (currNode == nullptr) {
+        throw std::runtime_error("called findReplacement() on nullptr");
+    }
+    if (currNode->getLeft() != nullptr) { //edge case: node only has one child
+        return getFarRightNode(currNode->getLeft());
+    } 
+    //TODO: figure out seg faults
+    return getFarLeftNode(currNode->getRight());
+}
+
+void BSTree::remove(const std::string& target, Node* currNode, Node* prevNode) {
+    if (currNode == nullptr) { //base case: end of path reached
+        return;
+    }
+    if (currNode->getData() == target) { //base case: node found
+        if (currNode->getCount() > 1) { //don't remove node if count is more than one
+            currNode->decrementCount();
+            return;
+        }
+        bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
+        if (isLeaf) { //edge case: (only) remove leaf
+            delete currNode;
+            return;
+        }
+        //replace target and delete it
+        Node* replacement = findReplacement(currNode);
+        //connect replacement node to the currNode's children
+        replacement->setLeft(currNode->getLeft());
+        replacement->setRight(currNode->getRight());
+        delete currNode;
+        //connect parent to replacement
+        if (prevNode == nullptr) { //no parents if removing root
+            return;
+        }
+        if (target < prevNode->getData()) {
+            prevNode->setLeft(replacement);
+        } else {
+            prevNode->setRight(replacement);
+        }
+        return;
+    }
+    //search rest of tree
+    remove(target, currNode->getLeft(), currNode);
+    remove(target, currNode->getRight(), currNode);
+}
+
+
+
+void BSTree::remove(const std::string& target) {
+    if (root_ == nullptr) { //edge case: empty tree
+        throw std::runtime_error("called remove() on empty tree");
+    }
+    if (target == root_->getData()) {
+
+    }
+    remove(target, root_, nullptr);
+}
+
 
 //traverse the tree from root to left subtree to right subtree
 void BSTree::preOrder(Node* currNode) const {
