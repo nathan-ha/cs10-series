@@ -38,11 +38,15 @@ void Node::incrementCount() {
 
 void Node::decrementCount() {
     if (count_ == 0) {
-        throw std::logic_error("called DecrementCount() on Node with count_=0");
+        throw std::logic_error("called decrementCount() on Node with count_=0");
     }
     --count_;
 }
 
 int Node::getCount() const {
     return count_;
+}
+
+void Node::setCount(int newCount) {
+    count_ = newCount;
 }

@@ -14,6 +14,7 @@ class Node {
         void setData(const std::string& newData);
         void incrementCount();
         void decrementCount();
+        void setCount(int newCount);
 
         Node* getLeft() const;
         Node* getRight() const;

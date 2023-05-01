@@ -1,66 +1,93 @@
-// #include <iostream>
-// #include <limits>
-// #include "BSTree.h"
+#include <iostream>
+#include <limits>
+#include "BSTree.h"
 
-// using namespace std;
+using namespace std;
 
-// void printOrders(BSTree *tree) {
-//   cout << "Preorder = ";
-//   tree->preOrder( );
-//   cout << "Inorder = ";
-//   tree->inOrder( );
-//   cout << "Postorder = ";
-//   tree->postOrder( );
-// }
+void printOrders(BSTree* tree) {
+  cout << "Preorder = ";
+  tree->preOrder( );
+  cout << "Inorder = ";
+  tree->inOrder( );
+  cout << "Postorder = ";
+  tree->postOrder( );
+}
 
-// int menu() {
-//   int choice = 0;
-//   cout << endl << "Enter menu choice: ";
-//   cout << endl;
-//   cout 
-//     << "1. Insert" << endl
-//     << "2. Remove" << endl
-//     << "3. Print" << endl
-//     << "4. Search" << endl
-//     << "5. Smallest" << endl
-//     << "6. Largest" << endl
-//     << "7. Height" << endl
-//     << "8. Quit" << endl;
-//   cin >> choice;
+int menu() {
+    int choice = 0;
+    cout << endl << "Enter menu choice: ";
+    cout << endl;
+    cout 
+        << "1. Insert" << endl
+        << "2. Remove" << endl
+        << "3. Print" << endl
+        << "4. Search" << endl
+        << "5. Smallest" << endl
+        << "6. Largest" << endl
+        << "7. Height" << endl
+        << "8. Quit" << endl;
+    // fix buffer just in case non-numeric choice entered
+    // also gets rid of newline character
+    cin >> choice;
+    cin.clear();
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
+    return choice;
+}
+
+int main( ) {
+    BSTree tree;
+
+    int choice = menu();
+
+    string entry;
   
-//   // fix buffer just in case non-numeric choice entered
-//   // also gets rid of newline character
-//   cin.clear();
-//   cin.ignore(numeric_limits<streamsize>::max(), '\n');
-//   return choice;
-// }
-
-// int main( ) {
-//     BSTree tree;
-
-//     int choice = menu();
-
-//     string entry;
-  
-//     while (choice != 8) {
-//         //TODO: add funtions
-//         if (choice == 1) {
-//           cout << "Enter string to insert: ";
-//         } else if (choice == 2) {
-//           cout << "Enter string to remove: ";
-//         } else if (choice == 3) {
-//         } else if (choice == 4) {
-//           cout << "Enter string to search for: ";
-//         } else if (choice == 5) {
-//           cout << "Smallest: " << endl;
-//         } else if (choice == 6) {
-//           cout << "Largest: " << endl;
-//         } else if (choice == 7) {
-//           cout << "Enter string: ";
-//         }
-//         //fix buffer just in case non-numeric choice entered
-//         choice = menu();
-//     }
-//     return 0;
-// }
+    while (choice != 8) {
+    try {
+        //TODO: add funtions
+        if (choice == 1) {
+            cout << "Enter string to insert: \n";
+            string input;
+            if (cin >> input) {
+                tree.insert(input);
+            } else {
+                throw runtime_error("bad input");
+            }
+        } else if (choice == 2) {
+            cout << "Enter string to remove: \n";
+            string input;
+            if (cin >> input) {
+                tree.remove(input);
+            } else {
+                throw runtime_error("bad input");
+            }
+        } else if (choice == 3) {
+            printOrders(&tree);
+        } else if (choice == 4) {
+            cout << "Enter string to search for: ";
+            string input;
+            if (cin >> input) {
+                if (tree.search(input)) {
+                    cout << "Found\n";
+                } else {
+                    cout << "Not Found\n";
+                }
+            } else {
+                throw runtime_error("bad input");
+            }
+        } else if (choice == 5) {
+            cout << "Smallest: " << tree.smallest() << endl;
+        } else if (choice == 6) {
+            cout << "Largest: " << tree.largest() << endl;
+        } else if (choice == 7) {
+            cout << "Enter string: ";
+        }
+        //fix buffer just in case non-numeric choice entered
+        choice = menu();
+    }
+    catch (runtime_error& e) {
+        //can't actually do anything with the exceptions since it breaks zybooks
+    }
+    }
+    return 0;
+}
 

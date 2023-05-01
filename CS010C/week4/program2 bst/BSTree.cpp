@@ -128,45 +128,50 @@ Node* BSTree::findReplacement(Node* start) const {
     return currNode;
 }
 
-//TODO: fix memory leak
 Node* BSTree::remove(const std::string& target, Node* currNode) {
-    //Note: every return in this function will represent the (new) child of curr
+    //Note: every return in this function will represent the (new) child of currNode
     // also the default return will be currNode since returning the current node does not change the state of the tree
-    if (currNode == nullptr) return currNode; //base case: target not found
-    if (currNode->getCount() > 1)  {
-        currNode->decrementCount();
-        return currNode;
-    }
+    if (currNode == nullptr) return nullptr; //base case: target not found
     //traverse tree
     if (target < currNode->getData()) {
-        //the root of the child's subtree might get changed, so this function will return that new root
         Node* newLeftChild = remove(target, currNode->getLeft());
         currNode->setLeft(newLeftChild);
     } else if (target > currNode->getData()) {
         Node* newRightChild = remove(target, currNode->getRight());
         currNode->setRight(newRightChild);
     }
+    if (target != currNode->getData()) return currNode; //have to check for this otherwise weird bug happens
     // base case: target found
+    //case 0: >1 count
+    if (currNode->getCount() > 1)  {
+        currNode->decrementCount();
+        return currNode;
+    }
     //case 1: no children
     bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
     if (isLeaf) {
+        if (root_ == currNode) root_ = nullptr; //edge case: root is only node
         delete currNode;
         return nullptr; //curr having no children means that the curr's parent will also have a null child
     }
     //case 2: one child
     if (currNode->getLeft() == nullptr) { //case 2.1: only has right child
         Node* rightChild = currNode->getRight();
+        if (root_ == currNode) root_ = rightChild; //edge case: replacing root
         delete currNode;
+        //no need to connect any nodes here since that's handled by the recursive call
         return rightChild; //assign the parent with the new child
     }
     if (currNode->getRight() == nullptr) { //case 2.2: only has left child
         Node* leftChild = currNode->getLeft();
+        if (root_ == currNode) root_ = leftChild; //edge case: replacing root
         delete currNode;
         return leftChild;
     }
     //general case: two children
     Node* replacement = findReplacement(currNode); //a suitable replacement for a node would be the leftmost node in the right subtree
     currNode->setData(replacement->getData()); //replace target data with the replacement's data
+    currNode->setCount(replacement->getCount());
     Node* newRightChild = remove(replacement->getData(), currNode->getRight()); //remove replacement (effectively swapping it with the target)
     currNode->setRight(newRightChild);
     return currNode;
@@ -222,8 +227,8 @@ void BSTree::postOrder(Node* currNode) const {
     if (currNode == nullptr) { //base case: end of path is reached
         return;
     }
-    postOrder(currNode->getRight());
     postOrder(currNode->getLeft());
+    postOrder(currNode->getRight());
     std::cout << currNode->getData() << "(" << currNode->getCount() << "), ";
 
 }
