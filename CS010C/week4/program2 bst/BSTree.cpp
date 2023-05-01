@@ -129,7 +129,7 @@ Node* BSTree::findReplacement(Node* start) const {
 }
 
 Node* BSTree::remove(const std::string& target, Node* currNode) {
-    //Note: every return in this function will represent the (new) child of currNode
+    //Note: every return in this function will represent the (new) child of (the previous) currNode
     // also the default return will be currNode since returning the current node does not change the state of the tree
     if (currNode == nullptr) return nullptr; //base case: target not found
     //traverse tree

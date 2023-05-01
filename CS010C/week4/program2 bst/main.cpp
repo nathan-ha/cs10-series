@@ -67,25 +67,32 @@ int main( ) {
             string input;
             if (cin >> input) {
                 if (tree.search(input)) {
-                    cout << "Found\n";
+                    cout << "Found\n\n";
                 } else {
-                    cout << "Not Found\n";
+                    cout << "Not Found\n\n";
                 }
             } else {
                 throw runtime_error("bad input");
             }
         } else if (choice == 5) {
-            cout << "Smallest: " << tree.smallest() << endl;
+            cout << "Smallest: " << endl << tree.smallest() << endl;
         } else if (choice == 6) {
-            cout << "Largest: " << tree.largest() << endl;
+            cout << "Largest: " << endl << tree.largest() << endl;
         } else if (choice == 7) {
-            cout << "Enter string: ";
-        }
+            cout << "Enter string:\n";
+            string input;
+            if (cin >> input) {
+                cout << "Height of subtree rooted at " << input << ": " << tree.height(input) << endl;
+            } else {
+                throw runtime_error("bad input");
+            }
+        }   
         //fix buffer just in case non-numeric choice entered
         choice = menu();
     }
-    catch (runtime_error& e) {
+    catch (...) {
         //can't actually do anything with the exceptions since it breaks zybooks
+        choice = menu();
     }
     }
     return 0;
