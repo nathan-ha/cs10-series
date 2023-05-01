@@ -14,13 +14,11 @@ class BSTree {
         void preOrder(Node* currNode) const;
         void inOrder(Node* currNode) const;
         void postOrder(Node* currNode) const;
-        void remove(const std::string& target, Node* currNode, Node* prevNode);
-        Node* findReplacement(Node* currNode, Node*& parent) const;
+        Node* remove(const std::string& target, Node* currNode);
+        Node* findReplacement(Node* currNode) const;
     public:
         BSTree();
         ~BSTree();
-
-        void print() const; //used to test functions
 
         void insert(const std::string& newString);
         void remove(const std::string& target);
