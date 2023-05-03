@@ -43,11 +43,10 @@ int main( ) {
   
     while (choice != 8) {
     try {
-        //TODO: add funtions
         if (choice == 1) {
             cout << "Enter string to insert: \n";
             string input;
-            if (cin >> input) {
+            if (getline(cin, input)) {
                 tree.insert(input);
             } else {
                 throw runtime_error("bad input");
@@ -55,7 +54,7 @@ int main( ) {
         } else if (choice == 2) {
             cout << "Enter string to remove: \n";
             string input;
-            if (cin >> input) {
+            if (getline(cin, input)) {
                 tree.remove(input);
             } else {
                 throw runtime_error("bad input");
@@ -63,25 +62,25 @@ int main( ) {
         } else if (choice == 3) {
             printOrders(&tree);
         } else if (choice == 4) {
-            cout << "Enter string to search for: ";
+            cout << "Enter string to search for: \n";
             string input;
-            if (cin >> input) {
+            if (getline(cin, input)) {
                 if (tree.search(input)) {
-                    cout << "Found\n\n";
+                    cout << "Found\n";
                 } else {
-                    cout << "Not Found\n\n";
+                    cout << "Not Found\n";
                 }
             } else {
                 throw runtime_error("bad input");
             }
         } else if (choice == 5) {
-            cout << "Smallest: " << endl << tree.smallest() << endl;
+            cout << "Smallest: " << tree.smallest() << endl;
         } else if (choice == 6) {
-            cout << "Largest: " << endl << tree.largest() << endl;
+            cout << "Largest: " << tree.largest() << endl;
         } else if (choice == 7) {
-            cout << "Enter string:\n";
+            cout << "Enter string: \n";
             string input;
-            if (cin >> input) {
+            if (getline(cin, input)) {
                 cout << "Height of subtree rooted at " << input << ": " << tree.height(input) << endl;
             } else {
                 throw runtime_error("bad input");
