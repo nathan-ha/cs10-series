@@ -74,7 +74,7 @@ void queue_array<T>::print() const {
     if (empty()) {
         throw std::out_of_range("can't print empty list, idiot");
     }
-    for (int i = front_; i <= back_; i++) {
+    for (int i = front_; i != back_; i++) {
         std::cout << data_[i] << ' ';
     }
     std::cout << '\n';
