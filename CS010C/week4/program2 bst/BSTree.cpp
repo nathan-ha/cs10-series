@@ -166,6 +166,8 @@ void BSTree::remove(const std::string& target) {
                 delete currNode;
                 return;
             }
+
+
             //case 2: target has one child
             if (currNode->getRight() == nullptr) { //case 2.1: only has left child
 
@@ -194,10 +196,20 @@ void BSTree::remove(const std::string& target) {
                 delete currNode;
                 return;
             }
+
+            // if the node to remove has a left child, 
+            // replace the node to remove with the largest string value that is smaller than the current string to remove 
+            // (i.e. find the largest value in the left subtree of the node to remove)
+
+            // If the node has no left child, 
+            // replace the node to remove with the smallest value larger than the current string to remove 
+            // (i.e. find the smallest value in the right subtree of the node to remove).
+            
+
+
             //TODO: this function swaps data into wrong place..I think
             //case 3: has two children
             Node* replacement = currNode->getLeft();
-            //look for suitable replacement (rightmost child of left subtree)
             while (replacement->getRight() != nullptr) {
                 replacement = replacement->getRight();
             }
