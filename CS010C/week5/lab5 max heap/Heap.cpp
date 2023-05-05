@@ -12,9 +12,9 @@ void Heap::enqueue(PrintJob* newJob) {
     int newJobIndex = numItems - 1;
     int parentIndex = (newJobIndex - 1) / 2;
     while (arr[newJobIndex]->getPriority() > arr[parentIndex]->getPriority()) { //max heap is violated when child is larger than parent
-        //insert the new job into the array until it gets to the right spot
+        //move the new element through the array until it gets to the right spot
         while (newJobIndex > parentIndex) {
-            //keep swapping newJob, moving it back through the array
+            //keep swapping newJob, effectively inserting it at its new position
             auto temp = arr[newJobIndex];
             arr[newJobIndex] = arr[newJobIndex - 1];
             arr[newJobIndex - 1] = temp;
@@ -59,8 +59,7 @@ void Heap::trickleDown(int root) {
 
 void Heap::dequeue() {
     if (numItems == 0) return;
-    //edge case: less than two children
-    //trickledown() doesn't work if either of the children are not initialized
+    //edge case: less than two children because trickledown() doesn't work if either of the children are not initialized
     if (numItems == 1) {
         numItems = 0;
         return;
@@ -69,6 +68,7 @@ void Heap::dequeue() {
         numItems = 1;
         return;
     }
+    //swap first and last element then trickle the new root down to the right spot
     arr[0] = arr[numItems - 1];
     numItems--;
     trickleDown(0);
