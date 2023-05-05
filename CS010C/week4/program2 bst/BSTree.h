@@ -13,7 +13,7 @@ class BSTree {
         void preOrder(Node* currNode) const;
         void inOrder(Node* currNode) const;
         void postOrder(Node* currNode) const;
-        int treeHeight(Node* currNode) const;
+        int height(Node* currNode) const;
     public:
         BSTree();
         ~BSTree();

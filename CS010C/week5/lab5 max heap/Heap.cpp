@@ -46,7 +46,7 @@ void Heap::trickleDown(int root) {
             arr[root] = temp;
             root = root * 2 + 2;
         }
-        if (root * 2 + 2 >= numItems) return;
+        if (root * 2 + 2 >= numItems) return; //don't continue if you are gonna go out of bounds
         leftChild = root * 2 + 1;
         leftChildPriority = arr[leftChild]->getPriority();
         rightChild = root * 2 + 2;

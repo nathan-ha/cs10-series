@@ -96,14 +96,13 @@ std::string BSTree::largest() const {
     return currNode->getData();
 }
 
-int BSTree::treeHeight(Node* currNode) const {
-    if (currNode == nullptr) {
+int BSTree::height(Node* root) const {
+    if (root == nullptr) {
         return -1;
     }
-    //search for largest path
-    int leftHeight = treeHeight(currNode->getLeft());
-    int rightHeight = treeHeight(currNode->getRight());
-    //return max of the paths
+    //search for largest path starting from root
+    int leftHeight = height(root->getLeft());
+    int rightHeight = height(root->getRight());
     if (leftHeight > rightHeight) {
         return leftHeight + 1;
     }
@@ -111,29 +110,20 @@ int BSTree::treeHeight(Node* currNode) const {
 }
 
 int BSTree::height(const std::string& target) const {
-    if (root_ == nullptr) {
-        return -1;
-    }
-    //get height of node measuring from bottom up
-    int totalHeightOfTree = treeHeight(root_);
-    //search for depth of target starting from root
+    //search for target node
     Node* currNode = root_;
-    int currDepth = 0;
     while (currNode != nullptr) {
         if (currNode->getData() == target) {
-            bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
-            if (isLeaf) return 0; //edge case: a leaf has no height under it
-            return totalHeightOfTree - currDepth;
+            break;
         }
-        //traverse tree
         if (target < currNode->getData()) {
             currNode = currNode->getLeft();
         } else {
             currNode = currNode->getRight();
         }
-        currDepth++;
     }
-    return -1;
+    //find height starting from curr
+    return height(currNode);
 }
 
 void BSTree::remove(const std::string& target) {
