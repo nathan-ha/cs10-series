@@ -55,7 +55,6 @@ void BSTree::insert(const std::string& newString) {
 
 bool BSTree::search(const std::string& target) const {
     if (root_ == nullptr) {
-        // throw std::runtime_error("called search() on empty list");
         return false;
     }
     Node* currNode = root_;
@@ -75,7 +74,6 @@ bool BSTree::search(const std::string& target) const {
 
 std::string BSTree::smallest() const {
     if (root_ == nullptr) {
-        // throw std::runtime_error("called smallest() on empty list");
         return "";
     }
     //go as far left through the tree as possible to find min value
@@ -88,7 +86,6 @@ std::string BSTree::smallest() const {
 
 std::string BSTree::largest() const {
     if (root_ == nullptr) {
-        // throw std::runtime_error("called largest() on empty list");
         return "";
     }
     //go as far right through the tree as possible to find max value
@@ -115,7 +112,6 @@ int BSTree::treeHeight(Node* currNode) const {
 
 int BSTree::height(const std::string& target) const {
     if (root_ == nullptr) {
-        // throw std::runtime_error("height() called on empty tree");
         return -1;
     }
     //get height of node measuring from bottom up
@@ -125,6 +121,8 @@ int BSTree::height(const std::string& target) const {
     int currDepth = 0;
     while (currNode != nullptr) {
         if (currNode->getData() == target) {
+            bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
+            if (isLeaf) return 0; //edge case: a leaf has no height under it
             return totalHeightOfTree - currDepth;
         }
         //traverse tree
@@ -138,7 +136,6 @@ int BSTree::height(const std::string& target) const {
     return -1;
 }
 
-
 void BSTree::remove(const std::string& target) {
     Node* parentNode = nullptr;
     Node* targetNode = root_;
@@ -146,135 +143,54 @@ void BSTree::remove(const std::string& target) {
     while (targetNode != nullptr) {
         //node found
         if (targetNode->getData() == target) {
-            //case 0: target count >1
+            //case 1: target count >1
             if (targetNode->getCount() > 1) {
                 targetNode->decrementCount();
                 return;
             }
-            //case 1: target is leaf
+            //case 2: target is leaf (no children)
             bool isLeaf = targetNode->getLeft() == nullptr && targetNode->getRight() == nullptr;
             if (isLeaf) {
-
-                if (targetNode == root_) { //case 1.1: only one node in tree
+                if (targetNode == root_) { //only one node in tree
                     root_ = nullptr;
-                } else if (parentNode->getLeft() == targetNode) { //case 1.2: removing as left child
+                } else if (parentNode->getLeft() == targetNode) { //removing as left child
                     parentNode->setLeft(nullptr);
                 } else { //case 1.3: removing as right child
                     parentNode->setRight(nullptr);
                 }
-
                 delete targetNode;
                 return;
-            }
-
-
-            //case 2: target has one child
-            // if (targetNode->getRight() == nullptr) { //case 2.1: only has left child
-
-            //     if (targetNode == root_) { //case 2.1.1: target is root
-            //         root_ = root_->getLeft();
-            //     } else if (parentNode->getLeft() == targetNode) { //case 2.1.2: removing as left child
-            //         parentNode->setLeft(targetNode->getLeft()); //connect parent to new child
-            //     } else { //case 2.1.3: removing as right child
-            //         parentNode->setRight(targetNode->getRight());
-            //     }
-
-            //     delete targetNode;
-            //     return;
-            //     // remove(targetNode->getData());
-            //     // return;
-            // }
-            // else if (targetNode->getLeft() == nullptr) { //case 2.2: only has right child
-
-            //     //same logic as 2.1
-            //     if (targetNode == root_) { //case 2.2.1: target is root
-            //         root_ = root_->getRight();
-            //     } else if (parentNode->getLeft() == targetNode) { //case 2.2.2: removing as left child
-            //         parentNode->setLeft(targetNode->getRight()); //connect parent to new child
-            //     } else { //case 2.2.3: removing as right child
-            //         parentNode->setRight(targetNode->getRight());
-            //     }
-
-            //     delete targetNode;
-            //     return;
-            //     // remove(targetNode->getData());
-            //     // return;
-            // }
-            
-            // ZYBOOKS ALGORITHM
-            // if the node to remove has a left child, 
-            // replace the node to remove with the largest string value that is smaller than the current string to remove 
-            // (i.e. find the largest value in the left subtree of the node to remove)
-
-            // If the node has no left child, 
-            // replace the node to remove with the smallest value larger than the current string to remove 
-            // (i.e. find the smallest value in the right subtree of the node to remove).
-
-            //i think this swaps values until swaps into leaf, then it deletes leaf
-
+            }            
+            //if the target has a left child
             if (targetNode->getLeft() != nullptr) {
-                std::cout << __LINE__ << '\n';
-                //replcae curr wit largest val of left child
+                //find largest val of left subtree to find replacement
                 Node* replacement = targetNode->getLeft();
-                Node* parentOfReplacement = nullptr;
                 while (replacement->getRight() != nullptr) {
-                    parentOfReplacement = replacement;
                     replacement = replacement->getRight();
                 }
+                //replace target's data
                 Node replacementCopy = *replacement;
-                remove(replacement->getData());
-                std::cout << __LINE__ << '\n';
-                if (search(replacement->getData())) {
-                    std::cout << __LINE__ << '\n';
-                    parentOfReplacement->setRight(replacement->getLeft());
-                    delete replacement;
-                }
-                std::cout << __LINE__ << '\n';
+                replacement->setCount(1);
+                remove(replacement->getData()); //nothing is leaked since this will be called recursively until leaf is reached
                 targetNode->setData(replacementCopy.getData());
                 targetNode->setCount(replacementCopy.getCount());
                 return;
             }
+            //if target has right child
             if (targetNode->getRight() != nullptr) {
-                std::cout << __LINE__ << '\n';
+                //find smallest val of right subtree
                 Node* replacement = targetNode->getRight();
-              
-                Node* parentOfReplacement = nullptr;
-                std::cout << __LINE__ << '\n';
                 while (replacement->getLeft() != nullptr) {
-                    parentOfReplacement = replacement;
                     replacement = replacement->getLeft();
                 }
-
+                //replace data
                 Node replacementCopy = *replacement;
+                replacement->setCount(1);
                 remove(replacement->getData());
-                std::cout << __LINE__ << '\n';
-                if (search(replacement->getData())) {
-                    std::cout << __LINE__ << '\n';
-                    parentOfReplacement->setRight(replacement->getRight());
-                    delete replacement;
-                }
-                std::cout << __LINE__ << '\n';
                 targetNode->setData(replacementCopy.getData());
                 targetNode->setCount(replacementCopy.getCount());
                 return;
             }
-            
-
-
-            //TODO: this function swaps data into wrong place..I think
-            //case 3: has two children
-            // Node* replacement = targetNode->getLeft();
-            // while (replacement->getRight() != nullptr) {
-            //     replacement = replacement->getRight();
-            // }
-            // //copy replacement data and delete it
-            // int replacementCount = replacement->getCount();
-            // std::string replacementData = replacement->getData();
-            // remove(replacementData); //replacement will either be a leaf or have one child
-            // //copy data over to targetNode
-            // targetNode->setData(replacementData);
-            // targetNode->setCount(replacementCount);
-            // return;
         }
         //continue to search for node
         parentNode = targetNode;
@@ -299,7 +215,6 @@ void BSTree::preOrder(Node* currNode) const {
 
 void BSTree::preOrder() const {
     if (root_ == nullptr) {
-        // throw std::runtime_error("preOrder() called on empty tree");
         std::cout << std::endl;
         return;
     }
@@ -319,7 +234,6 @@ void BSTree::inOrder(Node* currNode) const {
 
 void BSTree::inOrder() const {
     if (root_ == nullptr) {
-        // throw std::runtime_error("inOrder() called on empty tree");
         std::cout << std::endl;
         return;
     }
@@ -340,7 +254,6 @@ void BSTree::postOrder(Node* currNode) const {
 
 void BSTree::postOrder() const {
     if (root_ == nullptr) {
-        // throw std::runtime_error("postOrder() called on empty tree");
         std::cout << std::endl;
         return;
     }
