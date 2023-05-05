@@ -141,62 +141,67 @@ int BSTree::height(const std::string& target) const {
 
 void BSTree::remove(const std::string& target) {
     Node* parentNode = nullptr;
-    Node* currNode = root_;
+    Node* targetNode = root_;
     //search for node
-    while (currNode != nullptr) {
+    while (targetNode != nullptr) {
         //node found
-        if (currNode->getData() == target) {
+        if (targetNode->getData() == target) {
             //case 0: target count >1
-            if (currNode->getCount() > 1) {
-                currNode->decrementCount();
+            if (targetNode->getCount() > 1) {
+                targetNode->decrementCount();
                 return;
             }
             //case 1: target is leaf
-            bool isLeaf = currNode->getLeft() == nullptr && currNode->getRight() == nullptr;
+            bool isLeaf = targetNode->getLeft() == nullptr && targetNode->getRight() == nullptr;
             if (isLeaf) {
 
-                if (currNode == root_) { //case 1.1: only one node in tree
+                if (targetNode == root_) { //case 1.1: only one node in tree
                     root_ = nullptr;
-                } else if (parentNode->getLeft() == currNode) { //case 1.2: removing as left child
+                } else if (parentNode->getLeft() == targetNode) { //case 1.2: removing as left child
                     parentNode->setLeft(nullptr);
                 } else { //case 1.3: removing as right child
                     parentNode->setRight(nullptr);
                 }
 
-                delete currNode;
+                delete targetNode;
                 return;
             }
 
 
             //case 2: target has one child
-            if (currNode->getRight() == nullptr) { //case 2.1: only has left child
+            // if (targetNode->getRight() == nullptr) { //case 2.1: only has left child
 
-                if (currNode == root_) { //case 2.1.1: target is root
-                    root_ = root_->getLeft();
-                } else if (parentNode->getLeft() == currNode) { //case 2.1.2: removing as left child
-                    parentNode->setLeft(currNode->getLeft()); //connect parent to new child
-                } else { //case 2.1.3: removing as right child
-                    parentNode->setRight(currNode->getRight());
-                }
+            //     if (targetNode == root_) { //case 2.1.1: target is root
+            //         root_ = root_->getLeft();
+            //     } else if (parentNode->getLeft() == targetNode) { //case 2.1.2: removing as left child
+            //         parentNode->setLeft(targetNode->getLeft()); //connect parent to new child
+            //     } else { //case 2.1.3: removing as right child
+            //         parentNode->setRight(targetNode->getRight());
+            //     }
 
-                delete currNode;
-                return;
-            }
-            if (currNode->getLeft() == nullptr) { //case 2.2: only has right child
+            //     delete targetNode;
+            //     return;
+            //     // remove(targetNode->getData());
+            //     // return;
+            // }
+            // else if (targetNode->getLeft() == nullptr) { //case 2.2: only has right child
 
-                //same logic as 2.1
-                if (currNode == root_) { //case 2.2.1: target is root
-                    root_ = root_->getRight();
-                } else if (parentNode->getLeft() == currNode) { //case 2.2.2: removing as left child
-                    parentNode->setLeft(currNode->getRight()); //connect parent to new child
-                } else { //case 2.2.3: removing as right child
-                    parentNode->setRight(currNode->getRight());
-                }
+            //     //same logic as 2.1
+            //     if (targetNode == root_) { //case 2.2.1: target is root
+            //         root_ = root_->getRight();
+            //     } else if (parentNode->getLeft() == targetNode) { //case 2.2.2: removing as left child
+            //         parentNode->setLeft(targetNode->getRight()); //connect parent to new child
+            //     } else { //case 2.2.3: removing as right child
+            //         parentNode->setRight(targetNode->getRight());
+            //     }
 
-                delete currNode;
-                return;
-            }
-
+            //     delete targetNode;
+            //     return;
+            //     // remove(targetNode->getData());
+            //     // return;
+            // }
+            
+            // ZYBOOKS ALGORITHM
             // if the node to remove has a left child, 
             // replace the node to remove with the largest string value that is smaller than the current string to remove 
             // (i.e. find the largest value in the left subtree of the node to remove)
@@ -204,30 +209,79 @@ void BSTree::remove(const std::string& target) {
             // If the node has no left child, 
             // replace the node to remove with the smallest value larger than the current string to remove 
             // (i.e. find the smallest value in the right subtree of the node to remove).
+
+            //i think this swaps values until swaps into leaf, then it deletes leaf
+
+            if (targetNode->getLeft() != nullptr) {
+                std::cout << __LINE__ << '\n';
+                //replcae curr wit largest val of left child
+                Node* replacement = targetNode->getLeft();
+                Node* parentOfReplacement = nullptr;
+                while (replacement->getRight() != nullptr) {
+                    parentOfReplacement = replacement;
+                    replacement = replacement->getRight();
+                }
+                Node replacementCopy = *replacement;
+                remove(replacement->getData());
+                std::cout << __LINE__ << '\n';
+                if (search(replacement->getData())) {
+                    std::cout << __LINE__ << '\n';
+                    parentOfReplacement->setRight(replacement->getLeft());
+                    delete replacement;
+                }
+                std::cout << __LINE__ << '\n';
+                targetNode->setData(replacementCopy.getData());
+                targetNode->setCount(replacementCopy.getCount());
+                return;
+            }
+            if (targetNode->getRight() != nullptr) {
+                std::cout << __LINE__ << '\n';
+                Node* replacement = targetNode->getRight();
+              
+                Node* parentOfReplacement = nullptr;
+                std::cout << __LINE__ << '\n';
+                while (replacement->getLeft() != nullptr) {
+                    parentOfReplacement = replacement;
+                    replacement = replacement->getLeft();
+                }
+
+                Node replacementCopy = *replacement;
+                remove(replacement->getData());
+                std::cout << __LINE__ << '\n';
+                if (search(replacement->getData())) {
+                    std::cout << __LINE__ << '\n';
+                    parentOfReplacement->setRight(replacement->getRight());
+                    delete replacement;
+                }
+                std::cout << __LINE__ << '\n';
+                targetNode->setData(replacementCopy.getData());
+                targetNode->setCount(replacementCopy.getCount());
+                return;
+            }
             
 
 
             //TODO: this function swaps data into wrong place..I think
             //case 3: has two children
-            Node* replacement = currNode->getLeft();
-            while (replacement->getRight() != nullptr) {
-                replacement = replacement->getRight();
-            }
-            //copy replacement data and delete it
-            int replacementCount = replacement->getCount();
-            std::string replacementData = replacement->getData();
-            remove(replacementData); //replacement will either be a leaf or have one child
-            //copy data over to currNode
-            currNode->setData(replacementData);
-            currNode->setCount(replacementCount);
-            return;
+            // Node* replacement = targetNode->getLeft();
+            // while (replacement->getRight() != nullptr) {
+            //     replacement = replacement->getRight();
+            // }
+            // //copy replacement data and delete it
+            // int replacementCount = replacement->getCount();
+            // std::string replacementData = replacement->getData();
+            // remove(replacementData); //replacement will either be a leaf or have one child
+            // //copy data over to targetNode
+            // targetNode->setData(replacementData);
+            // targetNode->setCount(replacementCount);
+            // return;
         }
         //continue to search for node
-        parentNode = currNode;
-        if (target < currNode->getData()) {
-            currNode = currNode->getLeft();
+        parentNode = targetNode;
+        if (target < targetNode->getData()) {
+            targetNode = targetNode->getLeft();
         } else {
-            currNode = currNode->getRight();
+            targetNode = targetNode->getRight();
         }
     }
 }
