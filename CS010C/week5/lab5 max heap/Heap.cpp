@@ -12,7 +12,7 @@ void Heap::enqueue(PrintJob* newJob) {
     int newJobIndex = numItems - 1;
     int parentIndex = (newJobIndex - 1) / 2;
     while (arr[newJobIndex]->getPriority() > arr[parentIndex]->getPriority()) { //max heap is violated when child is larger than parent
-        //move the new element through the array until it gets to the right spot
+        //shift new element through the array until it gets to the right spot
         while (newJobIndex > parentIndex) {
             //keep swapping newJob, effectively inserting it at its new position
             auto temp = arr[newJobIndex];
