@@ -145,7 +145,7 @@ void BSTree::remove(const std::string& target) {
                     root_ = nullptr;
                 } else if (parentNode->getLeft() == targetNode) { //removing as left child
                     parentNode->setLeft(nullptr);
-                } else { //case 1.3: removing as right child
+                } else { //removing as right child
                     parentNode->setRight(nullptr);
                 }
                 delete targetNode;
