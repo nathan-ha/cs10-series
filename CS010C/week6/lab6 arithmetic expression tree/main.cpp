@@ -3,8 +3,11 @@
 
 using namespace std;
 
+
+
+
 int main()
-{
+{    
     string expr1 = "a+b*c";
     arithmeticExpression ex1(expr1);
     ex1.buildTree();

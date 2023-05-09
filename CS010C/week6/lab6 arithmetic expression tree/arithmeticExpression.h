@@ -19,6 +19,10 @@ private:
     string infixExpression;
     TreeNode *root;
 
+    //ban copies
+    arithmeticExpression operator=(const arithmeticExpression&);
+    arithmeticExpression(const arithmeticExpression&);
+
 public:
     /* Initializes an empty tree and sets the infixExpression
     to the value of parameter passed in. */

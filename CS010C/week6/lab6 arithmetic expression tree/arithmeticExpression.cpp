@@ -6,32 +6,91 @@ using namespace std;
 
 #include "arithmeticExpression.h"
 
-arithmeticExpression::arithmeticExpression(const string & infixExpression)
-  : infixExpression(infixExpression),
-    root(nullptr)
+arithmeticExpression::arithmeticExpression(const string &infixExpression)
+    : infixExpression(infixExpression),
+      root(nullptr)
 {
-  cout << "Try to build from: " << infixExpression << endl;
-  cout << "In postfix this is: " << infix_to_postfix() << endl;
-  throw std::runtime_error("create constructor");
 }
 
-void arithmeticExpression::infix() {
-  throw std::runtime_error("create infix");
-}
-void arithmeticExpression::prefix() {
-  throw std::runtime_error("create prefix");
-}
-void arithmeticExpression::postfix() {
-  throw std::runtime_error("create postfix");
-}
-void arithmeticExpression::buildTree() {
-  throw std::runtime_error("create buildTree");
+void arithmeticExpression::buildTree()
+{
+    string postfixExpression = infix_to_postfix();
+    stack<TreeNode*> nodes;
+    for (char c : postfixExpression)
+    {
+        bool isOperator = c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
+        if (isOperator)
+        {
+            // TODO: figure out what key and data are supposed to be in TreeNode
+
+            root = new TreeNode(c, c); // the operator will be the new root
+            // connect the parent to the two children that were just popped
+            root->right = nodes.top();
+            nodes.pop();
+            root->left = nodes.top();
+            nodes.pop();
+            nodes.push(root); // push the whole subtree back onto the stack
+        }
+        // otherwise push characters onto stack
+        else
+        {
+            nodes.push(new TreeNode(c, c));
+        }
+    }
 }
 
-void arithmeticExpression::visualizeTree(ofstream & out, TreeNode *T) {
-  throw std::runtime_error("create infix");
+// prints tree in order
+void arithmeticExpression::infix()
+{
+    infix(root);
 }
 
+// go left, print node, then go right
+void arithmeticExpression::infix(TreeNode *currNode)
+{
+    if (currNode == nullptr) return;
+    bool isLeaf = currNode->left == nullptr && currNode->right == nullptr;
+    if (!isLeaf)  cout << '('; //wrap parenthesis around non-leaf nodes so that individual letters do not have letters around them
+    infix(currNode->left);
+    cout << currNode->data;
+    infix(currNode->right);
+    if (!isLeaf) cout << ')';
+}
+
+// print tree in pre-order
+void arithmeticExpression::prefix()
+{
+    prefix(root);
+}
+
+// print node, then go left, then right
+void arithmeticExpression::prefix(TreeNode *currNode)
+{
+    if (currNode == nullptr) return;
+    cout << currNode->data;
+    prefix(currNode->left);
+    prefix(currNode->right);
+}
+
+// print tree in post-order
+void arithmeticExpression::postfix()
+{
+    postfix(root);
+}
+
+// go left, right, and print node
+void arithmeticExpression::postfix(TreeNode *currNode)
+{
+    if (currNode == nullptr) return;
+    postfix(currNode->left);
+    postfix(currNode->right);
+    cout << currNode->data;
+}
+
+void arithmeticExpression::visualizeTree(ofstream &out, TreeNode *T)
+{
+    throw std::runtime_error("create visualizeTree");
+}
 
 int arithmeticExpression::priority(char op)
 {
