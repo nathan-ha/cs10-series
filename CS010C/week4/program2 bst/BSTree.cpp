@@ -114,16 +114,16 @@ int BSTree::height(const std::string& target) const {
     Node* currNode = root_;
     while (currNode != nullptr) {
         if (currNode->getData() == target) {
-            break;
+            return height(currNode); //find height starting from curr
         }
+        //continue traversing tree
         if (target < currNode->getData()) {
             currNode = currNode->getLeft();
         } else {
             currNode = currNode->getRight();
         }
     }
-    //find height starting from curr
-    return height(currNode);
+    return -1; //not found
 }
 
 void BSTree::remove(const std::string& target) {
