@@ -22,19 +22,20 @@ using namespace std;
 #define Q "The Usual Suspects"
 #define R "Top Gun"
 
-void printOrders(Tree *tree) {
+void printOrders(Tree *tree)
+{
   cout << "Preorder = ";
-  tree->preOrder( );
+  tree->preOrder();
   cout << "Inorder = ";
-  tree->inOrder( );
+  tree->inOrder();
   cout << "Postorder = ";
-  tree->postOrder( );
+  tree->postOrder();
 }
 
-int main( ) {
+int main()
+{
 
   Tree tree;
-
 
   //------------------------------------------------------------------------
   // Test simple inserting from page 1
@@ -65,17 +66,12 @@ int main( ) {
   printOrders(&tree);
   cout << "----------------------------------------------------" << endl;
   cout << "Test 7" << endl;
-  if (!tree.search(C) 
-      || !tree.search(O) 
-      || !tree.search(G) 
-      || !tree.search(K) 
-      || !tree.search(P) 
-      || !tree.search(N)
-      || !tree.search(E) 
-      || !tree.search(I) 
-      || tree.search("z")) {
+  if (!tree.search(C) || !tree.search(O) || !tree.search(G) || !tree.search(K) || !tree.search(P) || !tree.search(N) || !tree.search(E) || !tree.search(I) || tree.search("z"))
+  {
     cout << "Seach phase failed" << endl;
-  } else {
+  }
+  else
+  {
     cout << "Search phase passed" << endl;
   }
   cout << "----------------------------------------------------" << endl;

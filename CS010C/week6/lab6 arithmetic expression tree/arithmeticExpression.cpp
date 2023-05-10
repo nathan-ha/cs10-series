@@ -12,6 +12,21 @@ arithmeticExpression::arithmeticExpression(const string &infixExpression)
 {
 }
 
+arithmeticExpression::~arithmeticExpression()
+{
+    burnTree(root);
+    root = nullptr;
+}
+
+void arithmeticExpression::burnTree(TreeNode *currNode)
+{
+    if (currNode == nullptr) return;
+    burnTree(currNode->left);
+    burnTree(currNode->right);
+    delete currNode;
+    currNode = nullptr;
+}
+
 void arithmeticExpression::buildTree()
 {
     string postfixExpression = infix_to_postfix();
@@ -24,7 +39,7 @@ void arithmeticExpression::buildTree()
             // TODO: figure out what key and data are supposed to be in TreeNode
 
             root = new TreeNode(c, c); // the operator will be the new root
-            // connect the parent to the two children that were just popped
+            // connect parent to top two nodes and pop them
             root->right = nodes.top();
             nodes.pop();
             root->left = nodes.top();
@@ -50,7 +65,7 @@ void arithmeticExpression::infix(TreeNode *currNode)
 {
     if (currNode == nullptr) return;
     bool isLeaf = currNode->left == nullptr && currNode->right == nullptr;
-    if (!isLeaf)  cout << '('; //wrap parenthesis around non-leaf nodes so that individual letters do not have letters around them
+    if (!isLeaf)  cout << '('; //wrap parentheses around non-leaf nodes so that individual letters do not have parentheses around them
     infix(currNode->left);
     cout << currNode->data;
     infix(currNode->right);
@@ -89,7 +104,12 @@ void arithmeticExpression::postfix(TreeNode *currNode)
 
 void arithmeticExpression::visualizeTree(ofstream &out, TreeNode *T)
 {
-    throw std::runtime_error("create visualizeTree");
+    if (T->left == nullptr || T->right == nullptr) return;
+    out << "\t\"" << T->data << "\"" << " -> " << "\"" << T->left->data << "\"" << ';' << endl;
+    out << "\t\"" << T->data << "\"" << " -> " << "\"" << T->right->data << "\"" << ';' << endl;
+    visualizeTree(out, T->left);
+    visualizeTree(out, T->right);
+
 }
 
 int arithmeticExpression::priority(char op)

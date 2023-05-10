@@ -30,7 +30,7 @@ public:
 
     /* Implementation of destrucor is optional.
        The destructor should deallocate all the nodes in the tree. */
-    //~arithmeticExpression();
+    ~arithmeticExpression();
 
     /* Converts the infixExpression to its equivalent postfix string
        and then generates the tree and assigns the root node to the
@@ -74,5 +74,8 @@ private:
 
     /* Helper function for generating the dotty file. This is a recursive function. */
     void visualizeTree(ofstream &, TreeNode *);
+
+    //helps with destroying tree
+    void burnTree(TreeNode *);
 };
 #endif

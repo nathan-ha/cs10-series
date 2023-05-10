@@ -5,7 +5,8 @@
 
 using namespace std;
 
-class Node {
+class Node
+{
 
   friend class Tree;
   Node(string small, string large);
@@ -21,7 +22,6 @@ private:
 
   // Add additional functions/variables here. Remember, you may not add any
   // Node * or string variables.
-
 };
 
 #endif
