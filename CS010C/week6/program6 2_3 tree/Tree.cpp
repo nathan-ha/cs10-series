@@ -4,13 +4,27 @@ using namespace std;
 #include "Tree.h"
 
 Tree::Tree()
+    : root_(nullptr)
 {
-    throw runtime_error("create constructor");
 }
+
 Tree::~Tree()
 {
-    throw runtime_error("create destructor");
+    burnTree(root_);
+    root_ = nullptr;
 }
+
+void Tree::burnTree(Node* root)
+{
+    if (root == nullptr) return;
+    //explore every subtree and delete them starting from the ends
+    burnTree(root->left);
+    burnTree(root->middle);
+    burnTree(root->right);
+    delete root;
+    root = nullptr;
+}
+
 void Tree::insert(const string &newString)
 {
     throw runtime_error("create insert()");

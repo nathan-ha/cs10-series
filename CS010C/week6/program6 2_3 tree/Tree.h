@@ -6,7 +6,7 @@
 class Tree
 {
 private:
-  Node *root;
+  Node *root_;
 
 public:
   Tree();
@@ -20,6 +20,7 @@ public:
 
 private:
   // Add additional functions/variables here
+  void burnTree(Node* root);
 };
 
 #endif
