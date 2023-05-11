@@ -20,8 +20,8 @@ private:
   Node *right;
   Node *parent;
 
-  // Add additional functions/variables here. Remember, you may not add any
-  // Node * or string variables.
+  int numChildren() const;
+  void print() const;
 };
 
 #endif

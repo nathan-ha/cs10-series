@@ -7,7 +7,6 @@ class Tree
 {
 private:
   Node *root_;
-
 public:
   Tree();
   ~Tree();
@@ -19,8 +18,11 @@ public:
   bool search(const string &) const;
 
 private:
-  // Add additional functions/variables here
-  void burnTree(Node* root);
+  void burnTree(Node *);
+  void preOrder(Node *) const;
+  void inOrder(Node *) const;
+  void insert(const string &, Node *);
+  void split(const string &, Node *);
 };
 
 #endif
