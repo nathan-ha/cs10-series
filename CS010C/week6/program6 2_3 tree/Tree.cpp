@@ -15,7 +15,7 @@ Tree::~Tree()
     root_ = nullptr;
 }
 
-void Tree::burnTree(Node* root)
+void Tree::burnTree(Node *root)
 {
     if (root == nullptr) return;
     //explore every subtree and delete them starting from the ends
@@ -26,128 +26,106 @@ void Tree::burnTree(Node* root)
     root = nullptr;
 }
 
-void Tree::insert(const string &newString)
+void Tree::insert(const string &newKey)
 {
     //edge case: empty tree
     if (root_ == nullptr)
     {
-        root_ = new Node(newString, "");
+        root_ = new Node(newKey, "");
         return;
     }
-    insert(newString, root_);
-}
 
-void Tree::insert(const string &newString, Node *root) 
-{
-    //find leaf node where new string belongs
-    bool isLeaf = root->left == nullptr && root->middle == nullptr && root->right == nullptr;
+    //look for leaf node where key belongs
+    Node *targetNode = root_;
+    bool isLeaf = targetNode->left == nullptr && targetNode->middle == nullptr && targetNode->right == nullptr;
     while (!isLeaf)
     {
-        //go left
-        if (newString < root->small)
+        if (newKey < targetNode->small)
         {
-            root = root->left;
+            targetNode = targetNode->left;
         }
-        //go middle
-        else if (root->small < newString && newString < root->large)
+        else if (targetNode->large < newKey)
         {
-            root = root->middle;
+            targetNode = targetNode->right;
         }
-        //go right
-        else if (root->large < newString)
-        {
-            root = root->right;
-        }
-        //new string equals one of the keys
         else
         {
-            throw runtime_error("insert(): tried inserting a duplicate");
+            targetNode = targetNode->middle;
         }
-        isLeaf = root->left == nullptr && root->middle == nullptr && root->right == nullptr;
+        isLeaf = targetNode->left == nullptr && targetNode->middle == nullptr && targetNode->right == nullptr;
     }
 
-    //case 1: insert to node with one element
-    bool hasOneKey = (root->small != "" && root->large != ""); //nodes with one key only have a small key
-    if (hasOneKey)
+    /* case 1: leaf has room for new key */
+    if (targetNode->large == "") //if a node has one key, the key will sit in the small part
     {
-        //new string is smaller than key
-        if (newString <  root->small)
+        targetNode->addKey(newKey);
+        return;
+    }
+    
+    /* case 2: no room in leaf */
+    //edge case: target node is the root (aka parent is null)
+    if (targetNode == root_)
+    {
+        string midKey = prepMidKey(targetNode, newKey);
+        root_ = new Node(midKey, "");
+        //split the target node into a left and right child for the new root
+        root_->left = targetNode;
+        root_->right = new Node(targetNode->large, "");
+        targetNode->large = "";
+        return;
+    }
+    //case 2.1: parent has space for another key
+    Node *parent = targetNode->parent;
+    if (parent->large == "")
+    {
+        string midKey = prepMidKey(targetNode, newKey); //middle key will be "tossed" up into the parent
+        parent->addKey(midKey);
+        //split the node
+        //case 2.1.1: need to split the left child of parent
+        if (parent->left = targetNode)
         {
-            root->large = root->small;
-            root->small = newString;
-            return;
+            parent->middle = new Node(targetNode->large, "");
+            targetNode->large = "";
+
         }
-        //new string is larger than key
-        else if (newString > root->small)
+        //case 2.1.2: need to split the right child of parent
+        else
         {
-            root->large = newString;
-            return;
+            parent->middle = new Node(targetNode->small, "");
+            targetNode->small = targetNode->large; //shift large key to small spot
+            targetNode->large = "";
         }
-        throw runtime_error("insert(): failed to insert to leaf with one key");
-    }
-    //case 2: insert to node with two keys
-    //find middle key between newString, small, and large
-    string middleKey;
-    //newString is middle
-    if (root->small < newString && newString < root->large)
-    {
-        middleKey = newString;
-    }
-    else if (newString < root->small)
-    {
-        middleKey = root->small;
-        root->small = newString; //small will be lifted
-    }
-    else if (root->large < newString)
-    {
-        middleKey = root->large;
-        root->large = newString; //large will be lifted
-    }
-    else
-    {
-        throw runtime_error("insert(): failed to lift key");
-    }
-    split(middleKey, root);
+        return;
+    }    
+
+    //TODO case 2.2: parent is full
+
+
+
+
 }
 
-void Tree::split(const string &key, Node *root)
+//finds the middle key between the two in the node, and another key
+//will also edit the node to replace the middle key with the inputted key (if needed)
+const string &Tree::prepMidKey(Node *root, const string &key)
 {
-    //lift middle key into parent
-    //keep lifting nodes until all lifted keys are in the tree
-    //if parent is full, repeat process for parent
-    //if root is full, make new root node
-
-    //base case: lifting out of big root
-    if (root->parent == nullptr)
+    if (root->small == "" || root->large == "")
     {
-        //what the fuck am i doing HELP
+        throw runtime_error("Tree::findMidKey(): tried to find middle key with a non-full node");
     }
-
-    bool parentIsFull = (root->parent->small != "") && (root->parent->large != "");
-    if (parentIsFull)
+    if (key < root->small)
     {
-        string middleKey;
-        //key is middle
-        if (root->small < key && key < root->large)
-        {
-            middleKey = key;
-        }
-        else if (key < root->small)
-        {
-            middleKey = root->small;
-            root->small = key; //small will be lifted
-        }
-        else if (root->large < key)
-        {
-            middleKey = root->large;
-            root->large = key; //large will be lifted
-        }
-        else
-        {
-            throw runtime_error("insert(): failed to lift key");
-        }
-        split(middleKey, root->parent);
+        string midKey = root->small;
+        root->small = key;
+        return midKey;
     }
+    if (root->large < key)
+    {
+        string midKey = root->large;
+        root->large = key;
+        return midKey;
+    }
+    return key;
 }
 
 void Tree::preOrder() const
@@ -168,11 +146,13 @@ void Tree::inOrder() const
 
 void Tree::inOrder(Node *root) const
 {
-    bool isLeaf = root->numChildren() == 0;
-    bool is2Node = root->numChildren() == 2;
+    if (root == nullptr) return;
+
+    bool isLeaf = (root->left == nullptr) && (root->middle == nullptr) && (root->right == nullptr);
+    bool is2Node = (root->left == nullptr) && (root->middle != nullptr) && (root->right == nullptr);
     if (isLeaf)
     {
-        root->print();
+        cout << root->small << ", ";
         return;
     }
     if (is2Node)
@@ -180,6 +160,7 @@ void Tree::inOrder(Node *root) const
         inOrder(root->left);
         cout << root->small << ", ";
         inOrder(root->right);
+        return;
     }
     //else: node is a 3-node
     inOrder(root->left);
@@ -197,7 +178,30 @@ void Tree::remove(const string &target)
 {
     throw runtime_error("create remove()");
 }
+
 bool Tree::search(const string &target) const
 {
-    throw runtime_error("create search()");
+    Node *currNode = root_;
+    while (currNode != nullptr)
+    {
+        //if target is found
+        if (currNode->small == target || currNode->large == target)
+        {
+            return true;
+        }
+        //otherwise, keep going through tree
+        if (target < currNode->small)
+        {
+            currNode = currNode->left;
+        }
+        else if (currNode->large < target)
+        {
+            currNode = currNode->right;
+        }
+        else
+        {
+            currNode = currNode->middle;
+        }
+    }
+    return false;
 }

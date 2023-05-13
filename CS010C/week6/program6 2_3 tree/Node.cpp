@@ -1,4 +1,5 @@
 #include <iostream>
+#include <stdexcept>
 using namespace std;
 
 #include "Node.h"
@@ -8,26 +9,26 @@ Node::Node(string small, string large)
 {
 }
 
-int Node::numChildren() const 
+//adds a key to a node, maintaining internal order
+void Node::addKey(const string& newKey)
 {
-    int count = 0;
-    if (left != nullptr) count++;
-    if (middle != nullptr) count++;
-    if (right != nullptr) count++;
-    return count;
-}
-
-void Node::print() const
-{
-    if (numChildren() == 0) return;
-    if (numChildren() == 1)
+    if (small != "" && large != "")
     {
-        cout << small;
-        return;
+        throw runtime_error("Node::addKey(): tried to add key to full node");
     }
-    if (numChildren() == 2)
+    //edge case: empty node
+    if (small == "" && large == "")
     {
-        cout << small << ", " << large;
-        return;
+        small = newKey;
+    }
+    //add key to correct position
+    else if (small < newKey)
+    {
+        large = newKey;
+    }
+    else
+    {
+        large = small;
+        small = newKey;
     }
 }

@@ -2,8 +2,8 @@
 #define __NODE_H
 
 #include <string>
-
 using namespace std;
+
 
 class Node
 {
@@ -20,8 +20,7 @@ private:
   Node *right;
   Node *parent;
 
-  int numChildren() const;
-  void print() const;
+  void addKey(const string&);
 };
 
 #endif

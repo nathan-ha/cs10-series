@@ -1,6 +1,8 @@
 #ifndef __TREE_H
 #define __TREE_H
 
+using namespace std;
+
 #include "Node.h"
 
 class Tree
@@ -21,8 +23,7 @@ private:
   void burnTree(Node *);
   void preOrder(Node *) const;
   void inOrder(Node *) const;
-  void insert(const string &, Node *);
-  void split(const string &, Node *);
+  const string &prepMidKey(Node *, const string &key);
 };
 
 #endif
