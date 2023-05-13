@@ -15,6 +15,7 @@ Tree::~Tree()
     root_ = nullptr;
 }
 
+//helps destructor
 void Tree::burnTree(Node *root)
 {
     if (root == nullptr) return;
@@ -26,6 +27,7 @@ void Tree::burnTree(Node *root)
     root = nullptr;
 }
 
+//inserts node and maintains 2-3 tree properties
 void Tree::insert(const string &newKey)
 {
     //edge case: empty tree
@@ -63,44 +65,44 @@ void Tree::insert(const string &newKey)
     }
     
     /* case 2: no room in leaf */
-    //edge case: target node is the root (aka parent is null)
-    if (targetNode == root_)
+    string midKey = prepMidKey(targetNode, newKey); //middle key will be "tossed" up into the parent
+    while (true)
     {
-        string midKey = prepMidKey(targetNode, newKey);
-        root_ = new Node(midKey, "");
-        //split the target node into a left and right child for the new root
-        root_->left = targetNode;
-        root_->right = new Node(targetNode->large, "");
-        targetNode->large = "";
-        return;
+        //edge case: target node is the root (aka parent is null)
+        if (targetNode == root_)
+        {
+            root_ = new Node(midKey, "");
+            //split the target node into a left and right child for the new root
+            root_->left = targetNode;
+            root_->right = new Node(targetNode->large, "");
+            targetNode->large = "";
+            return;
+        }
+        //case 2.1: parent has space for another key
+        Node *parent = targetNode->parent;
+        if (parent->large == "")
+        {
+            parent->addKey(midKey);
+            //split the node
+            //case 2.1.1: need to split the left child of parent
+            if (parent->left = targetNode)
+            {
+                parent->middle = new Node(targetNode->large, "");
+                targetNode->large = "";
+
+            }
+            //case 2.1.2: need to split the right child of parent
+            else
+            {
+                parent->middle = new Node(targetNode->small, "");
+                targetNode->small = targetNode->large; //shift large key to small spot
+                targetNode->large = "";
+            }
+            return;
+        }
+        midKey = prepMidKey(targetNode, midKey);
+        targetNode = parent;
     }
-    //case 2.1: parent has space for another key
-    Node *parent = targetNode->parent;
-    if (parent->large == "")
-    {
-        string midKey = prepMidKey(targetNode, newKey); //middle key will be "tossed" up into the parent
-        parent->addKey(midKey);
-        //split the node
-        //case 2.1.1: need to split the left child of parent
-        if (parent->left = targetNode)
-        {
-            parent->middle = new Node(targetNode->large, "");
-            targetNode->large = "";
-
-        }
-        //case 2.1.2: need to split the right child of parent
-        else
-        {
-            parent->middle = new Node(targetNode->small, "");
-            targetNode->small = targetNode->large; //shift large key to small spot
-            targetNode->large = "";
-        }
-        return;
-    }    
-
-    //TODO case 2.2: parent is full
-
-
 
 
 }
