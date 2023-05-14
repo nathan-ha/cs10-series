@@ -23,7 +23,8 @@ private:
   void burnTree(Node *);
   void preOrder(Node *) const;
   void inOrder(Node *) const;
-  const string &prepMidKey(Node *, const string &key);
+  void postOrder(Node *) const;
+  string prepMidKey(Node *, const string &key);
 };
 
 #endif

@@ -36,11 +36,16 @@ void Tree::insert(const string &newKey)
         root_ = new Node(newKey, "");
         return;
     }
+    //root already contains the key
+    else if ((newKey == root_->small) || (newKey == root_->large))
+    {
+        throw runtime_error("Tree::insert(): tree already contains this key");
+    }
 
     //look for leaf node where key belongs
     Node *targetNode = root_;
-    bool isLeaf = targetNode->left == nullptr && targetNode->middle == nullptr && targetNode->right == nullptr;
-    while (!isLeaf)
+    bool notLeaf = targetNode->left != nullptr || targetNode->middle != nullptr || targetNode->right != nullptr;
+    while (notLeaf)
     {
         if (newKey < targetNode->small)
         {
@@ -54,7 +59,11 @@ void Tree::insert(const string &newKey)
         {
             targetNode = targetNode->middle;
         }
-        isLeaf = targetNode->left == nullptr && targetNode->middle == nullptr && targetNode->right == nullptr;
+        if ((newKey == targetNode->small) || (newKey == targetNode->large))
+        {
+            throw runtime_error("Tree::insert(): tree already contains this key");
+        }
+        notLeaf = targetNode->left != nullptr || targetNode->middle != nullptr || targetNode->right != nullptr;
     }
 
     /* case 1: leaf has room for new key */
@@ -66,49 +75,70 @@ void Tree::insert(const string &newKey)
     
     /* case 2: no room in leaf */
     string midKey = prepMidKey(targetNode, newKey); //middle key will be "tossed" up into the parent
-    while (true)
+    //edge case: target node is the root (aka parent is null)
+    if (targetNode->parent == nullptr)
     {
-        //edge case: target node is the root (aka parent is null)
-        if (targetNode == root_)
-        {
-            root_ = new Node(midKey, "");
-            //split the target node into a left and right child for the new root
-            root_->left = targetNode;
-            root_->right = new Node(targetNode->large, "");
-            targetNode->large = "";
-            return;
-        }
-        //case 2.1: parent has space for another key
-        Node *parent = targetNode->parent;
-        if (parent->large == "")
-        {
-            parent->addKey(midKey);
-            //split the node
-            //case 2.1.1: need to split the left child of parent
-            if (parent->left = targetNode)
-            {
-                parent->middle = new Node(targetNode->large, "");
-                targetNode->large = "";
-            }
-            //case 2.1.2: need to split the right child of parent
-            else
-            {
-                parent->middle = new Node(targetNode->small, "");
-                targetNode->small = targetNode->large; //shift large key to small spot
-                targetNode->large = "";
-            }
-            return;
-        }
-        midKey = prepMidKey(targetNode, midKey);
-        targetNode = parent;
+        root_ = new Node(midKey, "");
+        //split the target node into a left and right child for the new root
+        root_->left = targetNode;
+        root_->right = new Node(targetNode->large, "");
+        targetNode->large = "";
+        return;
     }
-
-
+    //case 2.1: parent has space for another key
+    Node *parent = targetNode->parent;
+    if (parent->large == "")
+    {
+        parent->addKey(midKey);
+        //split the node
+        //case 2.1.1: need to split the left child of parent
+        if (parent->left == targetNode)
+        {
+            parent->middle = new Node(targetNode->large, "");
+            targetNode->large = "";
+        }
+        //case 2.1.2: need to split the right child of parent
+        else if (parent->right == targetNode)
+        {
+            parent->middle = new Node(targetNode->small, "");
+            targetNode->small = targetNode->large; //shift large key to small spot
+            targetNode->large = "";
+        }
+        return;
+    }
+        
+    //case 2.2: parent does not have space
+    // bool promotingNodes = true;
+    // while (promotingNodes)
+    // {
+    //     //split target
+    //     Node *newRightSibling = new Node(targetNode->large, "");
+    //     newRightSibling->large = "";
+    //     newRightSibling->parent = parent;
+    //     parent->right = newRightSibling;
+    //     parent->left = targetNode;
+    //     //split parent
+    //     Node *grandParent = new Node(prepMidKey(parent, midKey), "");
+    //     grandParent->left = parent;
+    //     grandParent->right = new Node(parent->large, "");
+    //     parent->parent = grandParent;
+    //     parent->large = "";
+    //     parent->right = parent->middle;
+    //     if (grandParent != root_ && grandParent->parent->large == "")
+    //     {
+    //         promotingNodes = false;
+    //     }
+    //     if (root_->parent != nullptr)
+    //     {
+    //         root_ = grandParent;
+    //     }
+    //     targetNode = targetNode->parent;
+    // }
 }
 
 //finds the middle key between the two in the node, and another key
 //will also edit the node to replace the middle key with the inputted key (if needed)
-const string &Tree::prepMidKey(Node *root, const string &key)
+string Tree::prepMidKey(Node *root, const string &key)
 {
     if (root->small == "" || root->large == "")
     {
@@ -131,12 +161,28 @@ const string &Tree::prepMidKey(Node *root, const string &key)
 
 void Tree::preOrder() const
 {
-    throw runtime_error("create preOrder()");
+    preOrder(root_);
+    cout << endl;
 }
 
 void Tree::preOrder(Node *root) const
 {
-    
+    if (root == nullptr) return;
+
+    bool is2Node = root->small != "" && root->large == "";
+    if (is2Node)
+    {
+        cout << root->small << ", ";
+        preOrder(root->left);
+        preOrder(root->right);
+        return;
+    }
+    //else: node is a 3-node
+    cout << root->small << ", ";
+    cout << root->large << ", ";
+    preOrder(root->left);
+    preOrder(root->middle);
+    preOrder(root->right);
 }
 
 void Tree::inOrder() const
@@ -149,13 +195,7 @@ void Tree::inOrder(Node *root) const
 {
     if (root == nullptr) return;
 
-    bool isLeaf = (root->left == nullptr) && (root->middle == nullptr) && (root->right == nullptr);
-    bool is2Node = (root->left == nullptr) && (root->middle != nullptr) && (root->right == nullptr);
-    if (isLeaf)
-    {
-        cout << root->small << ", ";
-        return;
-    }
+    bool is2Node = root->small != "" && root->large == "";
     if (is2Node)
     {
         inOrder(root->left);
@@ -166,15 +206,38 @@ void Tree::inOrder(Node *root) const
     //else: node is a 3-node
     inOrder(root->left);
     cout << root->small << ", ";
-    inOrder(root->middle);
     cout << root->large << ", ";
+    inOrder(root->middle);
     inOrder(root->right);
 }
 
 void Tree::postOrder() const
 {
-    throw runtime_error("create postOrder");
+    postOrder(root_);
+    cout << endl;
 }
+
+void Tree::postOrder(Node *root) const
+{
+    if (root == nullptr) return;
+
+    bool is2Node = root->small != "" && root->large == "";
+    if (is2Node)
+    {
+        postOrder(root->left);
+        postOrder(root->right);
+        cout << root->small << ", ";
+        return;
+    }
+    //else: node is a 3-node
+    postOrder(root->left);
+    postOrder(root->middle);
+    postOrder(root->right);
+    cout << root->small << ", ";
+    cout << root->large << ", ";
+}
+
+
 void Tree::remove(const string &target)
 {
     throw runtime_error("create remove()");
