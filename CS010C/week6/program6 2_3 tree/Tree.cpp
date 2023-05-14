@@ -89,7 +89,6 @@ void Tree::insert(const string &newKey)
             {
                 parent->middle = new Node(targetNode->large, "");
                 targetNode->large = "";
-
             }
             //case 2.1.2: need to split the right child of parent
             else
