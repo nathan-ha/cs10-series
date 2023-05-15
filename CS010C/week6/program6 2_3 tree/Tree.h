@@ -25,6 +25,7 @@ private:
   void inOrder(Node *) const;
   void postOrder(Node *) const;
   string prepMidKey(Node *, const string &key);
+  bool splitFullNode(Node *, Node *, const string &);
 };
 
 #endif

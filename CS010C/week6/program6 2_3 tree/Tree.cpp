@@ -113,55 +113,100 @@ void Tree::insert(const string &newKey)
     }
         
     //case 2.2: parent does not have space
-    bool promotingNodes = true;
-    while (promotingNodes)
+    bool allKeysInTree = false;
+    while (!allKeysInTree)
     {
         //split parent
         //edge case: parent is root
-        if (parent->parent == nullptr)
-        {
-            cout << __LINE__ << endl;
-            //make new root and connect to left and right children
-            Node* newRoot = new Node(prepMidKey(parent, midKey), "");
-            parent->parent = newRoot;
-            newRoot->left = parent; //original parent will be left child
-            Node* uncle = new Node(parent->large, "");
-            newRoot->right = uncle;
-            uncle->parent = newRoot;
-            parent->large = "";
-            root_ = newRoot;
-            //connect parents to children
-            //case 2.2.1: target node is a right child
-            if (parent->right == targetNode)
-            {
-                //split node (original node will be left child)
-                Node* newRightSibling = new Node(targetNode->large, "");
-                newRightSibling->parent = uncle;
-                targetNode->large = "";
-                uncle->left = targetNode;
-                uncle->right = newRightSibling;
-                targetNode->parent = uncle;
-                parent->right = parent->middle; //uncle took parent's middle and left children
-                parent->middle = nullptr;
-            }
-            //case 2.2.2: target node is a left child
-            else if (parent->left == targetNode)
-            {
-                //split node (original node will be left child)
-                Node* newRightSibling = new Node(targetNode->large, "");
-                newRightSibling->parent = parent;
-                targetNode->large = "";
-                uncle->left = parent->middle;
-                uncle->middle->parent = uncle;
-                uncle->right = parent->right; //uncle took parent's middle and right children
-                uncle->right->parent = uncle;
-                parent->right = newRightSibling;
-                parent->middle = nullptr;
-            }
-            return;
-        }
-        //TODO: parent is not root
+        // if (parent->parent == nullptr)
+        // {
+        //     //make new root and connect to left and right children
+        //     Node* newRoot = new Node(prepMidKey(parent, midKey), "");
+        //     parent->parent = newRoot;
+        //     newRoot->left = parent; //original parent will be left child
+        //     Node* uncle = new Node(parent->large, "");
+        //     newRoot->right = uncle;
+        //     uncle->parent = newRoot;
+        //     parent->large = "";
+        //     root_ = newRoot;
+        //     //connect parents to children
+        //     //case 2.2.1: target node is a right child
+        //     if (parent->right == targetNode)
+        //     {
+        //         //split node (original node will be left child)
+        //         Node* newRightSibling = new Node(targetNode->large, "");
+        //         newRightSibling->parent = uncle;
+        //         targetNode->large = "";
+        //         uncle->left = targetNode;
+        //         uncle->right = newRightSibling;
+        //         targetNode->parent = uncle;
+        //         parent->right = parent->middle; //uncle took parent's middle and left children
+        //         parent->middle = nullptr;
+        //     }
+        //     //case 2.2.2: target node is a left child
+        //     else if (parent->left == targetNode)
+        //     {
+        //         //split node (original node will be left child)
+        //         Node* newRightSibling = new Node(targetNode->large, "");
+        //         newRightSibling->parent = parent;
+        //         targetNode->large = "";
+        //         uncle->left = parent->middle;
+        //         uncle->middle->parent = uncle;
+        //         uncle->right = parent->right; //uncle took parent's middle and right children
+        //         uncle->right->parent = uncle;
+        //         parent->right = newRightSibling;
+        //         parent->middle = nullptr;
+        //     }
+        //     return;
+        // }
+        splitFullNode(parent, targetNode, midKey);
     }
+}
+
+bool Tree::splitFullNode(Node *parent, Node *targetNode, const string &midKey)
+{
+    //make new parents
+    Node* grandpa = new Node(prepMidKey(parent, midKey), "");
+    grandpa->parent = parent->parent;
+    parent->parent = grandpa;
+    grandpa->left = parent; //original parent will be left child
+    Node* uncle = new Node(parent->large, "");
+    grandpa->right = uncle;
+    uncle->parent = grandpa;
+    parent->large = "";
+    if (grandpa->parent == nullptr)
+    {
+        root_ = grandpa;
+    }
+    //connect parents to children
+    //case 2.2.1: target node is a right child
+    if (parent->right == targetNode)
+    {
+        //split node (original node will be left child)
+        Node* newRightSibling = new Node(targetNode->large, "");
+        newRightSibling->parent = uncle;
+        targetNode->large = "";
+        uncle->left = targetNode;
+        uncle->right = newRightSibling;
+        targetNode->parent = uncle;
+        parent->right = parent->middle; //uncle took parent's middle and left children
+        parent->middle = nullptr;
+    }
+    //case 2.2.2: target node is a left child
+    else if (parent->left == targetNode)
+    {
+        //split node (original node will be left child)
+        Node* newRightSibling = new Node(targetNode->large, "");
+        newRightSibling->parent = parent;
+        targetNode->large = "";
+        uncle->left = parent->middle;
+        uncle->middle->parent = uncle;
+        uncle->right = parent->right; //uncle took parent's middle and right children
+        uncle->right->parent = uncle;
+        parent->right = newRightSibling;
+        parent->middle = nullptr;
+    }
+
 }
 
 //finds the middle key between the two in the node, and another key
