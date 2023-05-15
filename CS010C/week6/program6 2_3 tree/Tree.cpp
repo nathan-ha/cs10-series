@@ -83,6 +83,9 @@ void Tree::insert(const string &newKey)
         root_->left = targetNode;
         root_->right = new Node(targetNode->large, "");
         targetNode->large = "";
+        root_->right->parent = root_;
+        targetNode->parent = root_;
+
         return;
     }
     //case 2.1: parent has space for another key
@@ -95,12 +98,14 @@ void Tree::insert(const string &newKey)
         if (parent->left == targetNode)
         {
             parent->middle = new Node(targetNode->large, "");
+            parent->middle->parent = parent;
             targetNode->large = "";
         }
         //case 2.1.2: need to split the right child of parent
         else if (parent->right == targetNode)
         {
             parent->middle = new Node(targetNode->small, "");
+            parent->middle->parent = parent;
             targetNode->small = targetNode->large; //shift large key to small spot
             targetNode->large = "";
         }
@@ -108,32 +113,55 @@ void Tree::insert(const string &newKey)
     }
         
     //case 2.2: parent does not have space
-    // bool promotingNodes = true;
-    // while (promotingNodes)
-    // {
-    //     //split target
-    //     Node *newRightSibling = new Node(targetNode->large, "");
-    //     newRightSibling->large = "";
-    //     newRightSibling->parent = parent;
-    //     parent->right = newRightSibling;
-    //     parent->left = targetNode;
-    //     //split parent
-    //     Node *grandParent = new Node(prepMidKey(parent, midKey), "");
-    //     grandParent->left = parent;
-    //     grandParent->right = new Node(parent->large, "");
-    //     parent->parent = grandParent;
-    //     parent->large = "";
-    //     parent->right = parent->middle;
-    //     if (grandParent != root_ && grandParent->parent->large == "")
-    //     {
-    //         promotingNodes = false;
-    //     }
-    //     if (root_->parent != nullptr)
-    //     {
-    //         root_ = grandParent;
-    //     }
-    //     targetNode = targetNode->parent;
-    // }
+    bool promotingNodes = true;
+    while (promotingNodes)
+    {
+        //split parent
+        //edge case: parent is root
+        if (parent->parent == nullptr)
+        {
+            cout << __LINE__ << endl;
+            //make new root and connect to left and right children
+            Node* newRoot = new Node(prepMidKey(parent, midKey), "");
+            parent->parent = newRoot;
+            newRoot->left = parent; //original parent will be left child
+            Node* uncle = new Node(parent->large, "");
+            newRoot->right = uncle;
+            uncle->parent = newRoot;
+            parent->large = "";
+            root_ = newRoot;
+            //connect parents to children
+            //case 2.2.1: target node is a right child
+            if (parent->right == targetNode)
+            {
+                //split node (original node will be left child)
+                Node* newRightSibling = new Node(targetNode->large, "");
+                newRightSibling->parent = uncle;
+                targetNode->large = "";
+                uncle->left = targetNode;
+                uncle->right = newRightSibling;
+                targetNode->parent = uncle;
+                parent->right = parent->middle; //uncle took parent's middle and left children
+                parent->middle = nullptr;
+            }
+            //case 2.2.2: target node is a left child
+            else if (parent->left == targetNode)
+            {
+                //split node (original node will be left child)
+                Node* newRightSibling = new Node(targetNode->large, "");
+                newRightSibling->parent = parent;
+                targetNode->large = "";
+                uncle->left = parent->middle;
+                uncle->middle->parent = uncle;
+                uncle->right = parent->right; //uncle took parent's middle and right children
+                uncle->right->parent = uncle;
+                parent->right = newRightSibling;
+                parent->middle = nullptr;
+            }
+            return;
+        }
+        //TODO: parent is not root
+    }
 }
 
 //finds the middle key between the two in the node, and another key
