@@ -37,3 +37,22 @@ void Node::addKey(const string& newKey)
         small = newKey;
     }
 }
+
+//removes a key while maintaining internal order
+void Node::removeKey(const string &key)
+{
+    if (key == large)
+    {
+        large = "";
+    }
+    else if (key == small)
+    {
+        //shift large to small
+        small = large;
+        large = "";
+    }
+    else
+    {
+        throw runtime_error("Node::removeKey(): this node does not contain the key");
+    }
+}

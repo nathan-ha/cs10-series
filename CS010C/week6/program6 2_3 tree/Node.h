@@ -20,7 +20,8 @@ private:
   Node *right;
   Node *parent;
 
-  void addKey(const string&);
+  void addKey(const string &);
+  void removeKey(const string &);
 };
 
 #endif

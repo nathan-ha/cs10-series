@@ -117,96 +117,51 @@ void Tree::insert(const string &newKey)
     while (!allKeysInTree)
     {
         //split parent
-        //edge case: parent is root
-        // if (parent->parent == nullptr)
-        // {
-        //     //make new root and connect to left and right children
-        //     Node* newRoot = new Node(prepMidKey(parent, midKey), "");
-        //     parent->parent = newRoot;
-        //     newRoot->left = parent; //original parent will be left child
-        //     Node* uncle = new Node(parent->large, "");
-        //     newRoot->right = uncle;
-        //     uncle->parent = newRoot;
-        //     parent->large = "";
-        //     root_ = newRoot;
-        //     //connect parents to children
-        //     //case 2.2.1: target node is a right child
-        //     if (parent->right == targetNode)
-        //     {
-        //         //split node (original node will be left child)
-        //         Node* newRightSibling = new Node(targetNode->large, "");
-        //         newRightSibling->parent = uncle;
-        //         targetNode->large = "";
-        //         uncle->left = targetNode;
-        //         uncle->right = newRightSibling;
-        //         targetNode->parent = uncle;
-        //         parent->right = parent->middle; //uncle took parent's middle and left children
-        //         parent->middle = nullptr;
-        //     }
-        //     //case 2.2.2: target node is a left child
-        //     else if (parent->left == targetNode)
-        //     {
-        //         //split node (original node will be left child)
-        //         Node* newRightSibling = new Node(targetNode->large, "");
-        //         newRightSibling->parent = parent;
-        //         targetNode->large = "";
-        //         uncle->left = parent->middle;
-        //         uncle->middle->parent = uncle;
-        //         uncle->right = parent->right; //uncle took parent's middle and right children
-        //         uncle->right->parent = uncle;
-        //         parent->right = newRightSibling;
-        //         parent->middle = nullptr;
-        //     }
-        //     return;
-        // }
-        splitFullNode(parent, targetNode, midKey);
+        // edge case: parent is root
+        if (parent->parent == nullptr)
+        {
+            //make new root and connect to left and right children
+            Node* newRoot = new Node(prepMidKey(parent, midKey), "");
+            parent->parent = newRoot;
+            newRoot->left = parent; //original parent will be left child
+            Node* uncle = new Node(parent->large, "");
+            newRoot->right = uncle;
+            uncle->parent = newRoot;
+            parent->large = "";
+            root_ = newRoot;
+            //connect parents to children
+            //case 2.2.1: target node is a right child
+            if (parent->right == targetNode)
+            {
+                //split node (original node will be left child)
+                Node* newRightSibling = new Node(targetNode->large, "");
+                newRightSibling->parent = uncle;
+                targetNode->large = "";
+                uncle->left = targetNode;
+                uncle->right = newRightSibling;
+                targetNode->parent = uncle;
+                parent->right = parent->middle; //uncle took parent's middle and left children
+                parent->middle = nullptr;
+            }
+            //case 2.2.2: target node is a left child
+            else if (parent->left == targetNode)
+            {
+                //split node (original node will be left child)
+                Node* newRightSibling = new Node(targetNode->large, "");
+                newRightSibling->parent = parent;
+                targetNode->large = "";
+                uncle->left = parent->middle;
+                uncle->middle->parent = uncle;
+                uncle->right = parent->right; //uncle took parent's middle and right children
+                uncle->right->parent = uncle;
+                parent->right = newRightSibling;
+                parent->middle = nullptr;
+            }
+            return;
+        }
+        //TODO: make general case for throwing keys up
+        return;
     }
-}
-
-bool Tree::splitFullNode(Node *parent, Node *targetNode, const string &midKey)
-{
-    //make new parents
-    Node* grandpa = new Node(prepMidKey(parent, midKey), "");
-    grandpa->parent = parent->parent;
-    parent->parent = grandpa;
-    grandpa->left = parent; //original parent will be left child
-    Node* uncle = new Node(parent->large, "");
-    grandpa->right = uncle;
-    uncle->parent = grandpa;
-    parent->large = "";
-    if (grandpa->parent == nullptr)
-    {
-        root_ = grandpa;
-    }
-    //connect parents to children
-    //case 2.2.1: target node is a right child
-    if (parent->right == targetNode)
-    {
-        //split node (original node will be left child)
-        Node* newRightSibling = new Node(targetNode->large, "");
-        newRightSibling->parent = uncle;
-        targetNode->large = "";
-        uncle->left = targetNode;
-        uncle->right = newRightSibling;
-        targetNode->parent = uncle;
-        parent->right = parent->middle; //uncle took parent's middle and left children
-        parent->middle = nullptr;
-    }
-    //case 2.2.2: target node is a left child
-    else if (parent->left == targetNode)
-    {
-        //split node (original node will be left child)
-        Node* newRightSibling = new Node(targetNode->large, "");
-        newRightSibling->parent = parent;
-        targetNode->large = "";
-        uncle->left = parent->middle;
-        uncle->middle->parent = uncle;
-        uncle->right = parent->right; //uncle took parent's middle and right children
-        uncle->right->parent = uncle;
-        parent->right = newRightSibling;
-        parent->middle = nullptr;
-    }
-
 }
 
 //finds the middle key between the two in the node, and another key
@@ -252,8 +207,8 @@ void Tree::preOrder(Node *root) const
     }
     //else: node is a 3-node
     cout << root->small << ", ";
-    cout << root->large << ", ";
     preOrder(root->left);
+    cout << root->large << ", ";
     preOrder(root->middle);
     preOrder(root->right);
 }
@@ -279,8 +234,8 @@ void Tree::inOrder(Node *root) const
     //else: node is a 3-node
     inOrder(root->left);
     cout << root->small << ", ";
-    cout << root->large << ", ";
     inOrder(root->middle);
+    cout << root->large << ", ";
     inOrder(root->right);
 }
 
@@ -305,15 +260,54 @@ void Tree::postOrder(Node *root) const
     //else: node is a 3-node
     postOrder(root->left);
     postOrder(root->middle);
-    postOrder(root->right);
     cout << root->small << ", ";
+    postOrder(root->right);
     cout << root->large << ", ";
 }
 
-
-void Tree::remove(const string &target)
+//remove a key while maintaining 2-3 tree properties
+void Tree::remove(const string &targetKey)
 {
-    throw runtime_error("create remove()");
+    //find node with target
+    Node *target = root_;
+    while (target->large != targetKey && target->small != targetKey)
+    {
+        if (target == nullptr) //target key was not found
+        {
+            throw runtime_error("remove(): key not found");
+        }
+        if (targetKey < target->small)
+        {
+            target = target->left;
+        }
+        else if (target->large < targetKey)
+        {
+            target = target->right;
+        }
+        else
+        {
+            target = target->middle;
+        }
+    }
+    bool isLeaf = target->left == nullptr; //if left is null, then the rest will be null too
+    //edge case: only one node
+    if (target == root_ && isLeaf)
+    {
+        //has one key
+        if (root_->large == "")
+        {
+            delete root_;
+            root_ = nullptr;
+        }
+        else
+        {
+            //otherwise, just remove the key
+            root_->removeKey(targetKey);
+        }
+        return;
+    }
+
+
 }
 
 bool Tree::search(const string &target) const
