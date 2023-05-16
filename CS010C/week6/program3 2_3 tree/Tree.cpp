@@ -113,54 +113,49 @@ void Tree::insert(const string &newKey)
     }
         
     //case 2.2: parent does not have space
-    bool allKeysInTree = false;
-    while (!allKeysInTree)
+
+    //split parent
+    // edge case: parent is root
+    if (parent->parent == nullptr)
     {
-        //split parent
-        // edge case: parent is root
-        if (parent->parent == nullptr)
+        //make new root and connect to left and right children
+        Node* newRoot = new Node(prepMidKey(parent, midKey), "");
+        parent->parent = newRoot;
+        newRoot->left = parent; //original parent will be left child
+        Node* uncle = new Node(parent->large, "");
+        newRoot->right = uncle;
+        uncle->parent = newRoot;
+        parent->large = "";
+        root_ = newRoot;
+        //connect parents to children
+        //case 2.2.1: target node is a right child
+        if (parent->right == targetNode)
         {
-            //make new root and connect to left and right children
-            Node* newRoot = new Node(prepMidKey(parent, midKey), "");
-            parent->parent = newRoot;
-            newRoot->left = parent; //original parent will be left child
-            Node* uncle = new Node(parent->large, "");
-            newRoot->right = uncle;
-            uncle->parent = newRoot;
-            parent->large = "";
-            root_ = newRoot;
-            //connect parents to children
-            //case 2.2.1: target node is a right child
-            if (parent->right == targetNode)
-            {
-                //split node (original node will be left child)
-                Node* newRightSibling = new Node(targetNode->large, "");
-                newRightSibling->parent = uncle;
-                targetNode->large = "";
-                uncle->left = targetNode;
-                uncle->right = newRightSibling;
-                targetNode->parent = uncle;
-                parent->right = parent->middle; //uncle took parent's middle and left children
-                parent->middle = nullptr;
-            }
-            //case 2.2.2: target node is a left child
-            else if (parent->left == targetNode)
-            {
-                //split node (original node will be left child)
-                Node* newRightSibling = new Node(targetNode->large, "");
-                newRightSibling->parent = parent;
-                targetNode->large = "";
-                uncle->left = parent->middle;
-                uncle->middle->parent = uncle;
-                uncle->right = parent->right; //uncle took parent's middle and right children
-                uncle->right->parent = uncle;
-                parent->right = newRightSibling;
-                parent->middle = nullptr;
-            }
-            return;
+            //split node (original node will be left child)
+            Node* newRightSibling = new Node(targetNode->large, "");
+            newRightSibling->parent = uncle;
+            targetNode->large = "";
+            uncle->left = targetNode;
+            uncle->right = newRightSibling;
+            targetNode->parent = uncle;
+            parent->right = parent->middle; //uncle took parent's middle and left children
+            parent->middle = nullptr;
+        }
+        //case 2.2.2: target node is a left child
+        else if (parent->left == targetNode)
+        {
+            //split node (original node will be left child)
+            Node* newRightSibling = new Node(targetNode->large, "");
+            newRightSibling->parent = parent;
+            targetNode->large = "";
+            uncle->left = parent->middle;
+            uncle->middle->parent = uncle;
+            uncle->right = parent->right; //uncle took parent's middle and right children
+            uncle->right->parent = uncle;
+            parent->right = newRightSibling;
+            parent->middle = nullptr;
         }
         //TODO: make general case for throwing keys up
-        return;
     }
 }
 
@@ -268,7 +263,7 @@ void Tree::postOrder(Node *root) const
 //remove a key while maintaining 2-3 tree properties
 void Tree::remove(const string &targetKey)
 {
-    //find node with target
+    //find node with target key
     Node *target = root_;
     while (target->large != targetKey && target->small != targetKey)
     {
@@ -307,7 +302,44 @@ void Tree::remove(const string &targetKey)
         }
         return;
     }
+    //if the target is a leaf with two keys
+    if (isLeaf && target->large != "")
+    {
+        target->removeKey(targetKey);
+        return;
+    }
 
+    //TODO: everything after this line in remove
+
+    //the target is a leaf with one key
+    Node *parent = target->parent;
+    Node *sibling = parent->middle;
+
+    //sibling has one key
+    if (sibling != nullptr && sibling->large == "")
+    {
+        //merge sibling and target
+        string siblingKey = sibling->small;
+        delete sibling;
+        parent->middle = nullptr;
+        //rotating data from parent and sibling to target
+        target->small = "";
+        //target is a right child (rotate right)
+        string parentKey = parent->large;
+        if (parent->right == target)
+        {
+            parentKey = parent->large;
+        }
+        //target is a left child (rotate left)
+        else if (parent->left == target)
+        {
+            parentKey = parent->small;
+            parent->small = parent->large;
+        }
+        parent->large = "";
+        target->addKey(siblingKey);
+        target->addKey(parentKey);
+    }
 
 }
 
