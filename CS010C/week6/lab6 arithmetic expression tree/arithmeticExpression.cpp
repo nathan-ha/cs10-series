@@ -18,6 +18,7 @@ arithmeticExpression::~arithmeticExpression()
     root = nullptr;
 }
 
+//helper for destructor, recursively deletes all nodes
 void arithmeticExpression::burnTree(TreeNode *currNode)
 {
     if (currNode == nullptr) return;
@@ -27,6 +28,7 @@ void arithmeticExpression::burnTree(TreeNode *currNode)
     currNode = nullptr;
 }
 
+//creates the expression tree
 void arithmeticExpression::buildTree()
 {
     string postfixExpression = infix_to_postfix();
@@ -36,8 +38,6 @@ void arithmeticExpression::buildTree()
         bool isOperator = c == '+' || c == '-' || c == '*' || c == '/' || c == '(' || c == ')';
         if (isOperator)
         {
-            // TODO: figure out what key and data are supposed to be in TreeNode
-
             root = new TreeNode(c, c); // the operator will be the new root
             // connect parent to top two nodes and pop them
             root->right = nodes.top();

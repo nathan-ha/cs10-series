@@ -289,6 +289,7 @@ void Tree::remove(const string &targetKey)
             target = target->middle;
         }
     }
+    
     bool isLeaf = target->left == nullptr; //if left is null, then the rest will be null too
     //edge case: only one node
     if (target == root_ && isLeaf)
