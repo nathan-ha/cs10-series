@@ -27,6 +27,18 @@ void Tree::burnTree(Node *root)
     root = nullptr;
 }
 
+//splits a full node and then returns the middle key, will return "" if no more keys are promoted
+string Tree::split(Node *child)
+{
+    if (child->large == "")
+    {
+        throw runtime_error("Tree::split(): tried to split a non-full node");
+    }
+    // Node *parent = child->parent;
+    throw runtime_error("create split()");
+
+}
+
 //inserts node and maintains 2-3 tree properties
 void Tree::insert(const string &newKey)
 {
@@ -44,7 +56,7 @@ void Tree::insert(const string &newKey)
 
     //look for leaf node where key belongs
     Node *targetNode = root_;
-    bool notLeaf = targetNode->left != nullptr || targetNode->middle != nullptr || targetNode->right != nullptr;
+    bool notLeaf = targetNode->left != nullptr; //leaf nodes will not have a left child, which implies that it doesn't have any children
     while (notLeaf)
     {
         if (newKey < targetNode->small)
@@ -63,17 +75,17 @@ void Tree::insert(const string &newKey)
         {
             throw runtime_error("Tree::insert(): tree already contains this key");
         }
-        notLeaf = targetNode->left != nullptr || targetNode->middle != nullptr || targetNode->right != nullptr;
+        notLeaf = targetNode->left != nullptr;
     }
 
-    /* case 1: leaf has room for new key */
+    // case 1: leaf has room for new key
     if (targetNode->large == "") //if a node has one key, the key will sit in the small part
     {
         targetNode->addKey(newKey);
         return;
     }
     
-    /* case 2: no room in leaf */
+    // case 2: no room in leaf
     string midKey = prepMidKey(targetNode, newKey); //middle key will be "tossed" up into the parent
     //edge case: target node is the root (aka parent is null)
     if (targetNode->parent == nullptr)
@@ -114,19 +126,21 @@ void Tree::insert(const string &newKey)
         
     //case 2.2: parent does not have space
 
-    //split parent
-    // edge case: parent is root
-    if (parent->parent == nullptr)
+    while (midKey != "") //keep looping until no more middle keys are being tossed up
     {
         //make new root and connect to left and right children
-        Node* newRoot = new Node(prepMidKey(parent, midKey), "");
-        parent->parent = newRoot;
-        newRoot->left = parent; //original parent will be left child
+        Node* grandParent = new Node(prepMidKey(parent, midKey), "");
+        grandParent->parent = parent->parent;
+        parent->parent = grandParent;
+        grandParent->left = parent; //original parent will be left child
         Node* uncle = new Node(parent->large, "");
-        newRoot->right = uncle;
-        uncle->parent = newRoot;
+        grandParent->right = uncle;
+        uncle->parent = grandParent;
         parent->large = "";
-        root_ = newRoot;
+        if (grandParent->parent == nullptr) root_ = grandParent;
+
+        //TODO: entire subtree is leaked somewhere
+
         //connect parents to children
         //case 2.2.1: target node is a right child
         if (parent->right == targetNode)
@@ -155,17 +169,19 @@ void Tree::insert(const string &newKey)
             parent->right = newRightSibling;
             parent->middle = nullptr;
         }
-        //TODO: make general case for throwing keys up
+        midKey = prepMidKey(parent, midKey);
+        parent = grandParent;
     }
 }
+
 
 //finds the middle key between the two in the node, and another key
 //will also edit the node to replace the middle key with the inputted key (if needed)
 string Tree::prepMidKey(Node *root, const string &key)
 {
-    if (root->small == "" || root->large == "")
+    if (root->large == "")
     {
-        throw runtime_error("Tree::findMidKey(): tried to find middle key with a non-full node");
+        return ""; //there is no middle key if there are only two keys
     }
     if (key < root->small)
     {
@@ -263,6 +279,11 @@ void Tree::postOrder(Node *root) const
 //remove a key while maintaining 2-3 tree properties
 void Tree::remove(const string &targetKey)
 {
+    //edge case: empty tree
+    if (root_ == nullptr)
+    {
+        throw runtime_error("Tree::remove(): tried to remove from empty tree");
+    }
     //find node with target key
     Node *target = root_;
     while (target->large != targetKey && target->small != targetKey)
@@ -297,8 +318,7 @@ void Tree::remove(const string &targetKey)
         }
         else
         {
-            //otherwise, just remove the key
-            root_->removeKey(targetKey);
+            root_->removeKey(targetKey); //just remove the key, and not the whole node
         }
         return;
     }
@@ -309,39 +329,77 @@ void Tree::remove(const string &targetKey)
         return;
     }
 
-    //TODO: everything after this line in remove
+    //case 1: removing node with one key
+    //looking for sibling to borrow from
+    Node *sibling = nullptr;
+    char siblingPosition = findValidSibling(target, sibling);
 
-    //the target is a leaf with one key
-    Node *parent = target->parent;
-    Node *sibling = parent->middle;
-
-    //sibling has one key
-    if (sibling != nullptr && sibling->large == "")
+    //case 1.1: sibling has a key avaiable
+    if (siblingPosition != 0)
     {
-        //merge sibling and target
-        string siblingKey = sibling->small;
-        delete sibling;
-        parent->middle = nullptr;
-        //rotating data from parent and sibling to target
-        target->small = "";
-        //target is a right child (rotate right)
-        string parentKey = parent->large;
-        if (parent->right == target)
-        {
-            parentKey = parent->large;
-        }
-        //target is a left child (rotate left)
-        else if (parent->left == target)
-        {
-            parentKey = parent->small;
-            parent->small = parent->large;
-        }
-        parent->large = "";
-        target->addKey(siblingKey);
-        target->addKey(parentKey);
+        //rotate
     }
 
+
+    //TODO: finish remove
+
 }
+
+//finds sibling with more than one key to take from
+//returns the location of the sibling relative to the parent along with a pointer to the sibling
+char Tree::findValidSibling(Node *curr, Node *&sibling)
+{
+    Node *parent = curr->parent;
+    //case 1: curr is a left child
+    if (parent->left == curr)
+    {
+        //immediate right sibling of left child
+        if (parent->middle == nullptr && parent->right->large != "")
+        {
+            sibling = parent->right;
+            return 'r';
+        }
+        else if (parent->middle != nullptr && parent->middle->large != "")
+        {
+            sibling = parent->middle;
+            return 'm';
+        }
+        sibling = nullptr;
+        return 0; //return null if immediate sibling does not have enough keys
+    }
+    //case 2: curr is a right child
+    if (parent->right == curr)
+    {
+        //immediate left sibling of right child
+        if (parent->middle == nullptr && parent->left->large != "")
+        {
+            sibling = parent->left;
+            return 'l';
+        }
+        else if (parent->middle != nullptr && parent->middle->large != "")
+        {
+            sibling = parent->middle;
+            return 'm';
+        }
+        sibling = nullptr;
+        return 0; //return null if immediate sibling does not have enough keys
+    }
+    //case 3: curr is a middle child
+    if (parent->left->large != "")
+    {
+        sibling = parent->left;
+        return 'l';
+    }
+    else if (parent->right->large != "")
+    {
+        sibling = parent->right;
+        return 'r';
+    }
+    sibling = nullptr;
+    return 0;
+}
+
+
 
 bool Tree::search(const string &target) const
 {

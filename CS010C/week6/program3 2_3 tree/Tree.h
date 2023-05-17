@@ -25,7 +25,8 @@ private:
   void inOrder(Node *) const;
   void postOrder(Node *) const;
   string prepMidKey(Node *, const string &key);
-  bool splitFullNode(Node *, Node *, const string &);
+  string split(Node *);
+  char findValidSibling(Node *, Node *&);
 };
 
 #endif
