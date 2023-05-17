@@ -27,6 +27,9 @@ private:
   string prepMidKey(Node *, const string &key);
   string split(Node *);
   char findValidSibling(Node *, Node *&);
+  void rotateLeft(Node *, Node *);
+  void rotateRight(Node *, Node *);
+
 };
 
 #endif

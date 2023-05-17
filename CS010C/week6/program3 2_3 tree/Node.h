@@ -22,6 +22,7 @@ private:
 
   void addKey(const string &);
   void removeKey(const string &);
+  void clear();
 };
 
 #endif

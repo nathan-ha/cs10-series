@@ -56,3 +56,10 @@ void Node::removeKey(const string &key)
         throw runtime_error("Node::removeKey(): this node does not contain the key");
     }
 }
+
+//clears all keys in a node, does not delete it
+void Node::clear()
+{
+    small = "";
+    large = "";
+}

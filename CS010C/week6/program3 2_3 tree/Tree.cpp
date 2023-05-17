@@ -329,20 +329,95 @@ void Tree::remove(const string &targetKey)
         return;
     }
 
-    //case 1: removing node with one key
-    //looking for sibling to borrow from
-    Node *sibling = nullptr;
-    char siblingPosition = findValidSibling(target, sibling);
-
-    //case 1.1: sibling has a key avaiable
-    if (siblingPosition != 0)
+    //case 1: removing leaf with one key
+    if (isLeaf && target->large == "")
     {
-        //rotate
+        //looking for sibling to borrow from
+        Node *sibling = nullptr;
+        Node *parent = target->parent;
+        char siblingPosition = findValidSibling(target, sibling);
+
+        //case 1.1: sibling has a key avaiable -- take a key from them
+        if (siblingPosition != 0)
+        {
+            //rotate sibling's key into target
+            //if target is a right child
+            if (parent->right == target)
+            {
+                rotateRight(target, sibling);
+            }
+            //if target is a left child
+            else if (parent->left == target)
+            {
+                rotateLeft(target, sibling);
+            }
+            //if target is a middle child
+            else if (parent->middle == target)
+            {
+                //rotate right or left depending on which siblings have spare keys
+                if (siblingPosition == 'l') //taking from left sibling
+                {
+                    rotateRight(target, sibling);
+                }
+                else if (siblingPosition == 'r') //taking from right sibling
+                {
+                    rotateLeft(target, sibling);
+                }
+            }
+            return;
+        }
+
+        //case 1.2: immediate sibling has no avaiable keys -- merge them
+
+        //if parent only has two children, merge the remaining child with it
+        if (parent->middle == nullptr)
+        {
+            parent->addKey(sibling->small);
+            delete target;
+            delete sibling;
+            parent->left = nullptr; //parent is now a leaf
+            parent->right = nullptr;
+            return;
+        }
+        //parent has three children
+        //removing as left child
+        if (parent->left == target)
+        {
+            target->clear();
+            target->addKey(parent->large); //replace target key with relevant sibling and parent keys
+            target->addKey(sibling->small);
+            parent->large = "";
+            delete sibling;
+            parent->middle = nullptr; //parent is now a 2-node
+
+        }
+        //TODO: remove as right/middle child
     }
 
 
     //TODO: finish remove
 
+}
+
+//rotate nodes left, used in insert
+void Tree::rotateLeft(Node *target, Node *sibling)
+{
+    Node *parent = target->parent;
+    target->small = parent->small;  //overwrite target's key with a parent's key
+    parent->small = parent->large;
+    parent->large = "";
+    parent->addKey(sibling->small); //move sibling's key into parent
+    sibling->removeKey(sibling->small);
+}
+
+//rotates nodes right, used in insert
+void Tree::rotateRight(Node *target, Node *sibling)
+{
+    Node *parent = target->parent;
+    target->small = parent->large; //overwrite target's key with a parent's key
+    parent->large = "";
+    parent->addKey(sibling->large); //move sibling's key into parent
+    sibling->large = "";
 }
 
 //finds sibling with more than one key to take from
