@@ -63,3 +63,9 @@ void Node::clear()
     small = "";
     large = "";
 }
+
+//returns if the node is a leaf or not
+bool Node::isLeaf() const
+{
+    return left == nullptr && right == nullptr && middle == nullptr;
+}

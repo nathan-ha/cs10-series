@@ -23,6 +23,7 @@ private:
   void addKey(const string &);
   void removeKey(const string &);
   void clear();
+  bool isLeaf() const;
 };
 
 #endif

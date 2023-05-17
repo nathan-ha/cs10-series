@@ -163,6 +163,7 @@ void Tree::insert(const string &newKey)
             newRightSibling->parent = parent;
             targetNode->large = "";
             uncle->left = parent->middle;
+            uncle->left->parent = uncle;
             uncle->middle->parent = uncle;
             uncle->right = parent->right; //uncle took parent's middle and right children
             uncle->right->parent = uncle;
@@ -329,6 +330,45 @@ void Tree::remove(const string &targetKey)
         return;
     }
 
+    //case 0: three keys in tree
+    bool rootHasTwoChildren = root_->middle == nullptr;
+    bool bothChildrenAreLeaves = root_->left->isLeaf() && root_->right->isLeaf();
+    if (rootHasTwoChildren && bothChildrenAreLeaves)
+    {
+        if (target == root_)
+        {
+            //merge two children into new root
+            root_->clear();
+            root_->addKey(root_->left->small);
+            root_->addKey(root_->right->small);
+            delete root_->left;
+            delete root_->right;
+            root_->left = nullptr;
+            root_->right = nullptr;
+            return;
+        }
+        else if (root_->right == target)
+        {
+            //delete right child and merge remaining two keys
+            delete target;
+            root_->addKey(root_->left->small);
+            delete root_->left;
+            root_->left = nullptr;
+            root_->right = nullptr;
+            return;
+        }
+        else if (root_->left == target)
+        {
+            //delete right child and merge remaining two keys
+            delete target;
+            root_->addKey(root_->right->small);
+            delete root_->right;
+            root_->left = nullptr;
+            root_->right = nullptr;
+            return;
+        }
+    }
+
     //case 1: removing leaf with one key
     if (isLeaf && target->large == "")
     {
@@ -338,7 +378,7 @@ void Tree::remove(const string &targetKey)
         char siblingPosition = findValidSibling(target, sibling);
 
         //case 1.1: sibling has a key avaiable -- take a key from them
-        if (siblingPosition != 0)
+        if (sibling != nullptr)
         {
             //rotate sibling's key into target
             //if target is a right child
@@ -366,9 +406,8 @@ void Tree::remove(const string &targetKey)
             }
             return;
         }
-
         //case 1.2: immediate sibling has no avaiable keys -- merge them
-
+        
         //if parent only has two children, merge the remaining child with it
         if (parent->middle == nullptr)
         {
@@ -379,23 +418,60 @@ void Tree::remove(const string &targetKey)
             parent->right = nullptr;
             return;
         }
+        
         //parent has three children
-        //removing as left child
-        if (parent->left == target)
+        //removing as right child
+        if (parent->right == target)
         {
+            sibling = parent->middle;
             target->clear();
             target->addKey(parent->large); //replace target key with relevant sibling and parent keys
+            cout << siblingPosition << endl;
             target->addKey(sibling->small);
+            
             parent->large = "";
             delete sibling;
             parent->middle = nullptr; //parent is now a 2-node
-
+            return;
         }
-        //TODO: remove as right/middle child
+        
+        //removing as left child
+        if (parent->left == target)
+        {
+            sibling = parent->middle;
+            target->clear();
+            target->addKey(parent->small); //replace target key with relevant sibling and parent keys
+            target->addKey(sibling->small);
+            parent->removeKey(parent->small);
+            delete sibling;
+            parent->middle = nullptr; //parent is now a 2-node
+            return;
+        }
+        
+        if (parent->middle == target)
+        {
+            //move parent key into sibling's key before deleting child
+            if (siblingPosition == 'l') //sibling is a left child
+            {
+                sibling->addKey(parent->small); //move parent's small key into left sibling
+                parent->removeKey(parent->small);
+            }
+            else if (siblingPosition == 'r')
+            {
+                sibling->addKey(parent->large); //move parent's large key into right sibling
+                parent->removeKey(parent->large);
+            }
+            delete target;
+            parent->middle = nullptr;
+            return;
+        }
+        //if this line is reached, one of the above cases did not run when it was supposed to
+        throw runtime_error("something went wrong when removing a leaf");
     }
 
 
     //TODO: finish remove
+    throw runtime_error("remove(): did not handle this case yet");
 
 }
 
@@ -445,6 +521,7 @@ char Tree::findValidSibling(Node *curr, Node *&sibling)
     //case 2: curr is a right child
     if (parent->right == curr)
     {
+        
         //immediate left sibling of right child
         if (parent->middle == nullptr && parent->left->large != "")
         {
@@ -460,16 +537,22 @@ char Tree::findValidSibling(Node *curr, Node *&sibling)
         return 0; //return null if immediate sibling does not have enough keys
     }
     //case 3: curr is a middle child
-    if (parent->left->large != "")
+    if (parent->middle == curr)
     {
-        sibling = parent->left;
-        return 'l';
+        
+        if (parent->left->large != "")
+        {
+            sibling = parent->left;
+            return 'l';
+        }
+        else if (parent->right->large != "")
+        {
+        
+            sibling = parent->right;
+            return 'r';
+        }
     }
-    else if (parent->right->large != "")
-    {
-        sibling = parent->right;
-        return 'r';
-    }
+    
     sibling = nullptr;
     return 0;
 }
