@@ -20,6 +20,8 @@ public:
   bool search(const string &) const;
 
 private:
+  Tree operator=(const Tree &);
+  Tree(const Tree &);
   void burnTree(Node *);
   void preOrder(Node *) const;
   void inOrder(Node *) const;
