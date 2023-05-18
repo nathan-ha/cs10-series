@@ -4,7 +4,8 @@
 
 class AVLTree
 {
-    Node *root_;
+    private:
+        Node *root_;
 
     public:
         AVLTree();
