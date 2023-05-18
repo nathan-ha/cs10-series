@@ -3,6 +3,8 @@
 Node::Node(const string &data)
     : left(nullptr),
       right(nullptr),
-      data(data)
+      parent(nullptr),
+      data(data),
+      count(1)
 {
 }

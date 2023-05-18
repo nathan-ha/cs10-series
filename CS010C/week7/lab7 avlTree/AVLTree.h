@@ -1,4 +1,8 @@
 #pragma once
+#include <fstream>
+#include <string>
+
+using namespace std;
 
 #include "Node.h"
 
@@ -9,17 +13,26 @@ class AVLTree
 
     public:
         AVLTree();
+        ~AVLTree();
         void insert(const string &);
         int balanceFactor(Node *) const;
         void printBalanceFactors() const;
+        void visualizeTree(const string &) const;
         
     private:
+        void burnTree(Node *);
         AVLTree operator=(const AVLTree &);
         AVLTree(const AVLTree &);
-        Node *findUnbalancedNode(Node *);
+        Node *findUnbalancedNode(Node *) const;
         void rotate(Node *);
         Node *rotateLeft(Node *);
         Node *rotateRight(Node *);
-        void printBalanceFactors(Node *);
+        void printBalanceFactors(Node *) const;
+        int height(Node *) const;
+        void visualizeTree(ofstream &, Node *) const;
+        Node *rotateRR(Node *);
+        Node *rotateLL(Node *);
+        Node *rotateRL(Node *);
+        Node *rotateLR(Node *);
 };
 

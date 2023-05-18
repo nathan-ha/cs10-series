@@ -11,5 +11,7 @@ class Node
     private:
         Node *left;
         Node *right;
+        Node *parent;
         string data;
+        int count;
 };
