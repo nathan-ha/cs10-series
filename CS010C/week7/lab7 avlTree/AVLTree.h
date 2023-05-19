@@ -30,9 +30,8 @@ class AVLTree
         void printBalanceFactors(Node *) const;
         int height(Node *) const;
         void visualizeTree(ofstream &, Node *) const;
-        Node *rotateRR(Node *);
-        Node *rotateLL(Node *);
-        Node *rotateRL(Node *);
         Node *rotateLR(Node *);
+        Node *rotateRL(Node *);
+        string rotateCase(Node *, const string &) const;
 };
 

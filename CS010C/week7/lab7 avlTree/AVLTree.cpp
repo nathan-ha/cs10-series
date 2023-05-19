@@ -1,6 +1,7 @@
 #include <iostream>
 #include <fstream>
 #include <stdexcept>
+#include <cmath>
 
 using namespace std;
 
@@ -68,12 +69,64 @@ void AVLTree::insert(const string &newKey)
             return;
         }
     }
+    if (abs(balanceFactor(root_)) <= 1) return; //only proceed if balance got messed up
+    //looks for the closest unbalanced node and tells us how to rotate it
+    Node *unbalancedNode = findUnbalancedNode(curr);
+    string rotationCase = rotateCase(unbalancedNode, newKey);
+    if (rotationCase == "LL")
+    {
+        rotateLeft(unbalancedNode);
+    }
+    else if (rotationCase == "LR")
+    {
+        rotateLR(unbalancedNode);
+    }
+    else if (rotationCase == "RR")
+    {
+        rotateRight(unbalancedNode);
+    }
+    else if (rotationCase == "RL")
+    {
+        rotateRL(unbalancedNode);
+    }
+}
+
+//returns a string indicating the rotation that should be performed on the subtree
+string AVLTree::rotateCase(Node *input, const string &key) const
+{
+    int inputBalanceFactor = balanceFactor(input);
+    bool leftHeavy = inputBalanceFactor < -1;
+    bool rightHeavy = inputBalanceFactor > 1;
+    //case 1: imbalance is on the left side
+    if (leftHeavy)
+    {
+        //case 1a: left child with left child
+        if (key < input->left->data)
+        {
+            return "LL";
+        }
+        //case 1b: left child with right child
+        return "LR";
+
+    }
+    //case 2: imbalance is on the right side
+    else if (rightHeavy)
+    {
+        //case 1a: right child with left child
+        if (key < input->right->data)
+        {
+            return "RL";
+        }
+        //case 1b: right child with right child
+        return "RR";
+    }
+    throw runtime_error("AVLTree::rotateCase(): cannot rotate balanced subtree");
 }
 
 //Returns the balance factor of a given node.
-int AVLTree::balanceFactor(Node *curr) const
+int AVLTree::balanceFactor(Node *input) const
 {
-    return height(curr->left) - height(curr->right); //balance factor is (left subtree height) - (right subtree height)
+    return height(input->left) - height(input->right); //balance factor is (left subtree height) - (right subtree height)
 }
 
 //Traverse and print the tree in inorder notation. 
@@ -96,8 +149,11 @@ void AVLTree::printBalanceFactors(Node *curr) const
 //Find and return the closest unbalanced node (with balance factor of 2 or -2) to the inserted node.
 Node *AVLTree::findUnbalancedNode(Node *curr) const
 {
-    #include <stdexcept>
-    throw std::runtime_error("create findUnbalancedNode()");
+    while (abs(balanceFactor(curr)) != 2)
+    {
+        curr = curr->parent;
+    }
+    return curr;
 }
 
 //Implement four possible imbalance cases and update the parent of the given node.
@@ -108,86 +164,77 @@ void AVLTree::rotate(Node *curr)
 }
 
 //Rotate the subtree to left at the given node and returns the new subroot.
-Node *AVLTree::rotateLeft(Node *curr)
+Node *AVLTree::rotateLeft(Node *input)
 {
-    #include <stdexcept>
-    throw std::runtime_error("create rotateLeft()");
-}
-
-//rotates subtree when subtree becomes left-heavy after insertion (left-left rotation)
-//actually does a right rotation
-//returns new root of subtree
-Node *AVLTree::rotateLL(Node *curr)
-{
+    Node *parent = input->parent;
+    Node *newRoot = input->right; //will be the new root (of subtree)
     //edge case: rotating root
-    if (curr == root_)
+    if (parent == nullptr)
     {
-        root_ = root_->left; //set new root
-        root_->parent = nullptr;
+        root_ = newRoot;
     }
-    //otherwise rotate right normally
+    //case 1: input is a left child
+    else if (parent->left == input)
+    {
+        parent->left = newRoot;
+    }
+    //case 2: input is a right child
     else
     {
-        Node *parent = curr->parent;
-        parent->left = curr->left;
-        parent->left->parent = parent; //fixes parent pointer
+        parent->right = newRoot;
     }
     //connect the rest of the nodes
-    Node *parent = curr->parent;
-    Node *leftChild = curr->left;
-    Node *leftLeftChild = leftChild->left;
-    leftChild->right = curr;
-    leftChild->left = leftLeftChild;
-    //fix parent pointers
-    leftChild->parent = parent;
-    curr->parent = leftChild;
-    //fix child pointers (they will always be leaves)
-    leftLeftChild->left = nullptr;
-    leftLeftChild->right = nullptr;
-    curr->left = nullptr;
-    curr->right = nullptr;
-    return leftChild; //left child is the new subroot
-}
-
-//rotates subtree when subtree becomes right-heavy after insertion (right-right rotation)
-//actually does a left rotation
-//returns new root of subtree
-Node *AVLTree::rotateRR(Node *curr)
-{
-    //edge case: rotating root
-    if (curr == root_)
-    {
-        root_ = root_->right; //set new root
-        root_->parent = nullptr;
-    }
-    //otherwise rotate left normally
-    else
-    {
-        Node *parent = curr->parent;
-        parent->right = curr->right;
-        parent->right->parent = parent; //fixes parent pointer
-    }
-    //connect the rest of the nodes
-    Node *parent = curr->parent;
-    Node *rightChild = curr->right;
-    Node *rightRightChild = rightChild->right;
-    rightChild->left = curr;
-    rightChild->right = rightRightChild;
-    //fix parent pointers
-    rightChild->parent = parent;
-    curr->parent = rightChild;
-    //fix child pointers (they will always be leaves)
-    rightRightChild->left = nullptr;
-    rightRightChild->right = nullptr;
-    curr->left = nullptr;
-    curr->right = nullptr;
-    return rightChild; //left child is the new subroot
+    newRoot->parent = parent;
+    input->parent = newRoot;
+    input->right = newRoot->left;
+    input->right->parent = input;
+    newRoot->left = input;
+    return newRoot;
 }
 
 //Rotate the subtree to right at the given node and returns the new subroot.
-Node *AVLTree::rotateRight(Node *curr)
+Node *AVLTree::rotateRight(Node *input)
 {
-    throw runtime_error("make rotateRight()");
+    Node *parent = input->parent;
+    Node *newRoot = input->left; //will be the new root (of subtree)
+    //edge case: rotating root
+    if (parent == nullptr)
+    {
+        root_ = newRoot;
+    }
+    //case 1: input is a left child
+    else if (parent->left == input)
+    {
+        parent->left = newRoot;
+    }
+    //case 2: input is a right child
+    else
+    {
+        parent->right = newRoot;
+    }
+    //connect the rest of the nodes
+    newRoot->parent = parent;
+    input->parent = newRoot;
+    input->left = newRoot->right;
+    input->left->parent = input;
+    newRoot->right = input;
+    return newRoot;
+}
+
+//rotates subtree when subtree has a left child who has a right child
+//returns root of balanced subtree
+Node *AVLTree::rotateLR(Node *curr)
+{
+    rotateLeft(curr->left); //gives a subtree with two left children (LL)
+    return rotateRight(curr); //finishes the tree rotation and returns the new root
+}
+
+//rotates subtree when subtree has a right child who has a left child
+//returns root of balanced subtree
+Node *AVLTree::rotateRL(Node *curr)
+{
+    rotateRight(curr->right); //gives a subtree with two right children (RR)
+    return rotateLeft(curr); //finishes the tree rotation and returns the new root
 }
 
 //returns the height of a node from the bottom of the tree
@@ -200,12 +247,7 @@ int AVLTree::height(Node *curr) const
     // go left and right
     int leftHeight = height(curr->left);
     int rightHeight = height(curr->right);
-    // return the max between the two heights
-    if (leftHeight > rightHeight)
-    {
-        return leftHeight + 1;
-    }
-    return rightHeight + 1;
+    return max(leftHeight, rightHeight) + 1; // return the max between the two heights
 }
 
 // Generates dotty file and visualize the tree using dotty program
