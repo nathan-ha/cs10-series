@@ -27,18 +27,6 @@ void Tree::burnTree(Node *root)
     root = nullptr;
 }
 
-//splits a full node and then returns the middle key, will return "" if no more keys are promoted
-string Tree::split(Node *child)
-{
-    if (child->large == "")
-    {
-        throw runtime_error("Tree::split(): tried to split a non-full node");
-    }
-    // Node *parent = child->parent;
-    throw runtime_error("create split()");
-
-}
-
 //inserts node and maintains 2-3 tree properties
 void Tree::insert(const string &newKey)
 {
@@ -139,8 +127,6 @@ void Tree::insert(const string &newKey)
         parent->large = "";
         if (grandParent->parent == nullptr) root_ = grandParent;
 
-        //TODO: entire subtree is leaked somewhere
-
         //connect parents to children
         //case 2.2.1: target node is a right child
         if (parent->right == targetNode)
@@ -184,12 +170,14 @@ string Tree::prepMidKey(Node *root, const string &key)
     {
         return ""; //there is no middle key if there are only two keys
     }
+    //replaces the small key
     if (key < root->small)
     {
         string midKey = root->small;
         root->small = key;
         return midKey;
     }
+    //replaces the large key
     if (root->large < key)
     {
         string midKey = root->large;
@@ -205,6 +193,7 @@ void Tree::preOrder() const
     cout << endl;
 }
 
+//print small, look left, print large, then look middle, then look right
 void Tree::preOrder(Node *root) const
 {
     if (root == nullptr) return;
@@ -231,6 +220,7 @@ void Tree::inOrder() const
     cout << endl;
 }
 
+//print small, look left, then look middle, print large, then look right
 void Tree::inOrder(Node *root) const
 {
     if (root == nullptr) return;
@@ -257,6 +247,7 @@ void Tree::postOrder() const
     cout << endl;
 }
 
+//look left, look middle, print small, look right, then print large
 void Tree::postOrder(Node *root) const
 {
     if (root == nullptr) return;
@@ -469,8 +460,6 @@ void Tree::remove(const string &targetKey)
         throw runtime_error("something went wrong when removing a leaf");
     }
 
-
-    //TODO: finish remove
     throw runtime_error("remove(): did not handle this case yet");
 
 }

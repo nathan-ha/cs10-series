@@ -69,7 +69,7 @@ void AVLTree::insert(const string &newKey)
             return;
         }
     }
-    if (abs(balanceFactor(root_)) <= 1) return; //only proceed if balance got messed up
+    if (abs(balanceFactor(root_)) <= 1) return; //only proceed if balance got messed up 
     //looks for the closest unbalanced node and tells us how to rotate it
     Node *unbalancedNode = findUnbalancedNode(curr);
     string rotationCase = rotateCase(unbalancedNode, newKey);
