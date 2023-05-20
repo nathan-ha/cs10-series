@@ -41,7 +41,13 @@ void AVLTree::insert(const string &newKey)
     Node *curr = root_;
     while (curr != nullptr)
     {
-        if (newKey < curr->data)
+        //edge case: duplicate insertion
+        if (newKey == curr->data)
+        {
+            curr->count++;
+            return;
+        }
+        else if (newKey < curr->data)
         {
             if (curr->left == nullptr)
             {
@@ -63,31 +69,29 @@ void AVLTree::insert(const string &newKey)
             }
             curr = curr->right;
         }
-        else if (newKey == curr->data)
+    }
+    // if (abs(balanceFactor(root_)) <= 1) return; //only proceed if balance got messed up 
+    while (abs(balanceFactor(root_)) > 1)
+    {
+        //looks for the closest unbalanced node and tells us how to rotate it
+        Node *unbalancedNode = findUnbalancedNode(curr);
+        string rotationCase = rotateCase(unbalancedNode, newKey);
+        if (rotationCase == "LL")
         {
-            curr->count++;
-            return;
+            curr = rotateRight(unbalancedNode);
         }
-    }
-    if (abs(balanceFactor(root_)) <= 1) return; //only proceed if balance got messed up 
-    //looks for the closest unbalanced node and tells us how to rotate it
-    Node *unbalancedNode = findUnbalancedNode(curr);
-    string rotationCase = rotateCase(unbalancedNode, newKey);
-    if (rotationCase == "LL")
-    {
-        rotateLeft(unbalancedNode);
-    }
-    else if (rotationCase == "LR")
-    {
-        rotateLR(unbalancedNode);
-    }
-    else if (rotationCase == "RR")
-    {
-        rotateRight(unbalancedNode);
-    }
-    else if (rotationCase == "RL")
-    {
-        rotateRL(unbalancedNode);
+        else if (rotationCase == "RR")
+        {
+            curr = rotateLeft(unbalancedNode);
+        }
+        else if (rotationCase == "LR")
+        {
+            curr = rotateLR(unbalancedNode);
+        }
+        else if (rotationCase == "RL")
+        {
+            curr = rotateRL(unbalancedNode);
+        }
     }
 }
 
@@ -95,8 +99,8 @@ void AVLTree::insert(const string &newKey)
 string AVLTree::rotateCase(Node *input, const string &key) const
 {
     int inputBalanceFactor = balanceFactor(input);
-    bool leftHeavy = inputBalanceFactor < -1;
-    bool rightHeavy = inputBalanceFactor > 1;
+    bool leftHeavy = inputBalanceFactor > 1;
+    bool rightHeavy = inputBalanceFactor < -1;
     //case 1: imbalance is on the left side
     if (leftHeavy)
     {
@@ -107,17 +111,16 @@ string AVLTree::rotateCase(Node *input, const string &key) const
         }
         //case 1b: left child with right child
         return "LR";
-
     }
     //case 2: imbalance is on the right side
     else if (rightHeavy)
     {
-        //case 1a: right child with left child
+        //case 2a: right child with left child
         if (key < input->right->data)
         {
             return "RL";
         }
-        //case 1b: right child with right child
+        //case 2b: right child with right child
         return "RR";
     }
     throw runtime_error("AVLTree::rotateCase(): cannot rotate balanced subtree");
@@ -149,7 +152,7 @@ void AVLTree::printBalanceFactors(Node *curr) const
 //Find and return the closest unbalanced node (with balance factor of 2 or -2) to the inserted node.
 Node *AVLTree::findUnbalancedNode(Node *curr) const
 {
-    while (abs(balanceFactor(curr)) != 2)
+    while (abs(balanceFactor(curr)) < 2)
     {
         curr = curr->parent;
     }
@@ -183,11 +186,11 @@ Node *AVLTree::rotateLeft(Node *input)
     {
         parent->right = newRoot;
     }
-    //connect the rest of the nodes
+    //connect rest of nodes
     newRoot->parent = parent;
     input->parent = newRoot;
     input->right = newRoot->left;
-    input->right->parent = input;
+    if (input->right != nullptr) input->right->parent = input; //newRoot may or may not have had a left child
     newRoot->left = input;
     return newRoot;
 }
@@ -216,7 +219,7 @@ Node *AVLTree::rotateRight(Node *input)
     newRoot->parent = parent;
     input->parent = newRoot;
     input->left = newRoot->right;
-    input->left->parent = input;
+    if (input->left != nullptr) input->left->parent = input; //newRoot may or may not have had a right child
     newRoot->right = input;
     return newRoot;
 }

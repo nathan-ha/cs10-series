@@ -46,6 +46,10 @@ int main()
     {
       tree.printBalanceFactors();
     }
+    else if (choice == 4)
+    {
+      tree.visualizeTree("tree.jpg");
+    }
     // fix buffer just in case non-numeric choice entered
     choice = menu();
   }
