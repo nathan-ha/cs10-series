@@ -31,6 +31,6 @@ class AVLTree
         Node *rotateRight(Node *);
         int height(Node *) const;
         void printBalanceFactors(Node *) const;
-        void visualizeTree(ofstream &, Node *) const;
+        void visualizeTree(std::ofstream &, Node *) const;
 };
 
