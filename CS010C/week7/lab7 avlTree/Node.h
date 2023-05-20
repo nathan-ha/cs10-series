@@ -1,8 +1,6 @@
 #pragma once
 #include <string>
 
-using namespace std;
-
 class Node
 {
     friend class AVLTree;
@@ -12,6 +10,6 @@ class Node
         Node *left;
         Node *right;
         Node *parent;
-        string data;
+        std::string data;
         int count;
 };
