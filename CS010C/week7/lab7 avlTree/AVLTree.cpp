@@ -70,33 +70,32 @@ void AVLTree::insert(const string &newKey)
             curr = curr->right;
         }
     }
-    // if (abs(balanceFactor(root_)) <= 1) return; //only proceed if balance got messed up 
-    while (abs(balanceFactor(root_)) > 1)
+
+    Node *unbalancedNode = findUnbalancedNode(curr);
+    if (unbalancedNode == nullptr) return;
+    //looks for the closest unbalanced node and rotate it accordingly
+    AVLTree::imbalanceType rotationCase = rotateCase(unbalancedNode, newKey);
+    if (rotationCase == LL)
     {
-        //looks for the closest unbalanced node and tells us how to rotate it
-        Node *unbalancedNode = findUnbalancedNode(curr);
-        string rotationCase = rotateCase(unbalancedNode, newKey);
-        if (rotationCase == "LL")
-        {
-            curr = rotateRight(unbalancedNode);
-        }
-        else if (rotationCase == "RR")
-        {
-            curr = rotateLeft(unbalancedNode);
-        }
-        else if (rotationCase == "LR")
-        {
-            curr = rotateLR(unbalancedNode);
-        }
-        else if (rotationCase == "RL")
-        {
-            curr = rotateRL(unbalancedNode);
-        }
+        rotateRight(unbalancedNode);
     }
+    else if (rotationCase == RR)
+    {
+        rotateLeft(unbalancedNode);
+    }
+    else if (rotationCase == LR)
+    {
+        rotateLR(unbalancedNode);
+    }
+    else if (rotationCase == RL)
+    {
+        rotateRL(unbalancedNode);
+    }
+    
 }
 
-//returns a string indicating the rotation that should be performed on the subtree
-string AVLTree::rotateCase(Node *input, const string &key) const
+//returns a enum indicating the rotation that should be performed on the subtree
+AVLTree::imbalanceType AVLTree::rotateCase(Node *input, const string &key) const
 {
     int inputBalanceFactor = balanceFactor(input);
     bool leftHeavy = inputBalanceFactor > 1;
@@ -107,10 +106,10 @@ string AVLTree::rotateCase(Node *input, const string &key) const
         //case 1a: left child with left child
         if (key < input->left->data)
         {
-            return "LL";
+            return LL;
         }
         //case 1b: left child with right child
-        return "LR";
+        return LR;
     }
     //case 2: imbalance is on the right side
     else if (rightHeavy)
@@ -118,12 +117,12 @@ string AVLTree::rotateCase(Node *input, const string &key) const
         //case 2a: right child with left child
         if (key < input->right->data)
         {
-            return "RL";
+            return RL;
         }
         //case 2b: right child with right child
-        return "RR";
+        return RR;
     }
-    throw runtime_error("AVLTree::rotateCase(): cannot rotate balanced subtree");
+    throw runtime_error("AVLTree::rotateCase(): tried to rotate balanced subtree");
 }
 
 //Returns the balance factor of a given node.
@@ -152,11 +151,18 @@ void AVLTree::printBalanceFactors(Node *curr) const
 //Find and return the closest unbalanced node (with balance factor of 2 or -2) to the inserted node.
 Node *AVLTree::findUnbalancedNode(Node *curr) const
 {
-    while (abs(balanceFactor(curr)) < 2)
+    while (curr != nullptr)
     {
-        curr = curr->parent;
+        if (abs(balanceFactor(curr)) > 1)
+        {
+            return curr;
+        }
+        else
+        {
+            curr = curr->parent;
+        }
     }
-    return curr;
+    return nullptr;
 }
 
 //Implement four possible imbalance cases and update the parent of the given node.
@@ -199,7 +205,7 @@ Node *AVLTree::rotateLeft(Node *input)
 Node *AVLTree::rotateRight(Node *input)
 {
     Node *parent = input->parent;
-    Node *newRoot = input->left; //will be the new root (of subtree)
+    Node *newRoot = input->left;
     //edge case: rotating root
     if (parent == nullptr)
     {
@@ -229,7 +235,7 @@ Node *AVLTree::rotateRight(Node *input)
 Node *AVLTree::rotateLR(Node *curr)
 {
     rotateLeft(curr->left); //gives a subtree with two left children (LL)
-    return rotateRight(curr); //finishes the tree rotation and returns the new root
+    return rotateRight(curr); //balances that subtree and returns the new root
 }
 
 //rotates subtree when subtree has a right child who has a left child
@@ -237,7 +243,7 @@ Node *AVLTree::rotateLR(Node *curr)
 Node *AVLTree::rotateRL(Node *curr)
 {
     rotateRight(curr->right); //gives a subtree with two right children (RR)
-    return rotateLeft(curr); //finishes the tree rotation and returns the new root
+    return rotateLeft(curr); //balances that subtree and returns the new root
 }
 
 //returns the height of a node from the bottom of the tree

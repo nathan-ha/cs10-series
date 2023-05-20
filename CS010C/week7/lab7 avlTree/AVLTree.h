@@ -20,6 +20,7 @@ class AVLTree
         void visualizeTree(const string &) const;
         
     private:
+        enum imbalanceType {RR, LL, RL, LR};
         void burnTree(Node *);
         AVLTree operator=(const AVLTree &);
         AVLTree(const AVLTree &);
@@ -32,6 +33,6 @@ class AVLTree
         void visualizeTree(ofstream &, Node *) const;
         Node *rotateLR(Node *);
         Node *rotateRL(Node *);
-        string rotateCase(Node *, const string &) const;
+        imbalanceType rotateCase(Node *, const string &) const;
 };
 
