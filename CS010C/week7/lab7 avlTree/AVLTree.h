@@ -20,19 +20,19 @@ class AVLTree
         void visualizeTree(const string &) const;
         
     private:
-        enum imbalanceType {RR, LL, RL, LR};
-        void burnTree(Node *);
+        //bans copies
         AVLTree operator=(const AVLTree &);
         AVLTree(const AVLTree &);
+        //helpers
+        enum imbalanceType {RR, LL, RL, LR};
+        imbalanceType rotateCase(Node *, const string &) const;
+        void burnTree(Node *);
         Node *findUnbalancedNode(Node *) const;
-        void rotate(Node *);
+        Node *rotate(Node *, const string &);
         Node *rotateLeft(Node *);
         Node *rotateRight(Node *);
-        void printBalanceFactors(Node *) const;
         int height(Node *) const;
+        void printBalanceFactors(Node *) const;
         void visualizeTree(ofstream &, Node *) const;
-        Node *rotateLR(Node *);
-        Node *rotateRL(Node *);
-        imbalanceType rotateCase(Node *, const string &) const;
 };
 

@@ -70,28 +70,36 @@ void AVLTree::insert(const string &newKey)
             curr = curr->right;
         }
     }
-
+    //fix imbalance that the insertion caused
     Node *unbalancedNode = findUnbalancedNode(curr);
     if (unbalancedNode == nullptr) return;
-    //looks for the closest unbalanced node and rotate it accordingly
-    AVLTree::imbalanceType rotationCase = rotateCase(unbalancedNode, newKey);
+    rotate(unbalancedNode, newKey);
+}
+
+//rotates the subtree based on the type of imbalance
+//returns new root of the subtree
+Node *AVLTree::rotate(Node *input, const string &key)
+{
+    AVLTree::imbalanceType rotationCase = rotateCase(input, key);
     if (rotationCase == LL)
     {
-        rotateRight(unbalancedNode);
+        return rotateRight(input);
     }
-    else if (rotationCase == RR)
+    if (rotationCase == RR)
     {
-        rotateLeft(unbalancedNode);
+        return rotateLeft(input);
     }
-    else if (rotationCase == LR)
+    if (rotationCase == LR)
     {
-        rotateLR(unbalancedNode);
+        rotateLeft(input->left); //yields a subtree with two right children (LL)
+        return rotateRight(input);
     }
-    else if (rotationCase == RL)
+    if (rotationCase == RL)
     {
-        rotateRL(unbalancedNode);
+        rotateRight(input->right); //yields a subtree with two right children (RR)
+        return rotateLeft(input);
     }
-    
+    throw runtime_error("AVLTree::rotate(): failed to rotate subtree");
 }
 
 //returns a enum indicating the rotation that should be performed on the subtree
@@ -126,9 +134,10 @@ AVLTree::imbalanceType AVLTree::rotateCase(Node *input, const string &key) const
 }
 
 //Returns the balance factor of a given node.
+//balance factor is defined as (left subtree height) - (right subtree height)
 int AVLTree::balanceFactor(Node *input) const
 {
-    return height(input->left) - height(input->right); //balance factor is (left subtree height) - (right subtree height)
+    return height(input->left) - height(input->right);
 }
 
 //Traverse and print the tree in inorder notation. 
@@ -153,23 +162,10 @@ Node *AVLTree::findUnbalancedNode(Node *curr) const
 {
     while (curr != nullptr)
     {
-        if (abs(balanceFactor(curr)) > 1)
-        {
-            return curr;
-        }
-        else
-        {
-            curr = curr->parent;
-        }
+        if (abs(balanceFactor(curr)) > 1) return curr; //found imbalance
+        curr = curr->parent;
     }
-    return nullptr;
-}
-
-//Implement four possible imbalance cases and update the parent of the given node.
-void AVLTree::rotate(Node *curr)
-{
-    #include <stdexcept>
-    throw std::runtime_error("create rotate()");
+    return nullptr; //if all the nodes are balanced
 }
 
 //Rotate the subtree to left at the given node and returns the new subroot.
@@ -230,33 +226,13 @@ Node *AVLTree::rotateRight(Node *input)
     return newRoot;
 }
 
-//rotates subtree when subtree has a left child who has a right child
-//returns root of balanced subtree
-Node *AVLTree::rotateLR(Node *curr)
-{
-    rotateLeft(curr->left); //gives a subtree with two left children (LL)
-    return rotateRight(curr); //balances that subtree and returns the new root
-}
-
-//rotates subtree when subtree has a right child who has a left child
-//returns root of balanced subtree
-Node *AVLTree::rotateRL(Node *curr)
-{
-    rotateRight(curr->right); //gives a subtree with two right children (RR)
-    return rotateLeft(curr); //balances that subtree and returns the new root
-}
-
 //returns the height of a node from the bottom of the tree
 int AVLTree::height(Node *curr) const
 {
-    if (curr == nullptr)
-    {
-        return -1;
-    }
-    // go left and right
+    if (curr == nullptr) return -1; //base case: end of path reached
     int leftHeight = height(curr->left);
     int rightHeight = height(curr->right);
-    return max(leftHeight, rightHeight) + 1; // return the max between the two heights
+    return max(leftHeight, rightHeight) + 1; //return largest height between children
 }
 
 // Generates dotty file and visualize the tree using dotty program
