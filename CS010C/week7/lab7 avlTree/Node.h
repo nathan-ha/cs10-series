@@ -11,5 +11,4 @@ class Node
         Node *right;
         Node *parent;
         std::string data;
-        int count;
 };

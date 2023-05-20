@@ -1,10 +1,9 @@
 #include "Node.h"
 
-Node::Node(const string &data)
+Node::Node(const std::string &data)
     : left(nullptr),
       right(nullptr),
       parent(nullptr),
-      data(data),
-      count(1)
+      data(data)
 {
 }

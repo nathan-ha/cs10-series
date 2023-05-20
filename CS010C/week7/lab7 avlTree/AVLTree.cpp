@@ -41,13 +41,8 @@ void AVLTree::insert(const string &newKey)
     Node *curr = root_;
     while (curr != nullptr)
     {
-        //edge case: duplicate insertion
-        if (newKey == curr->data)
-        {
-            curr->count++;
-            return;
-        }
-        else if (newKey < curr->data)
+        if (newKey == curr->data) return; //edge case: duplicate insertion, don't insert it
+        if (newKey < curr->data)
         {
             if (curr->left == nullptr)
             {
