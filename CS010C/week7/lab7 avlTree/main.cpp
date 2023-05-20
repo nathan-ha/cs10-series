@@ -46,7 +46,7 @@ int main()
     {
       tree.printBalanceFactors();
     }
-    else if (choice == 4)
+    else if (choice == 0)
     {
       tree.visualizeTree("tree.jpg");
     }
