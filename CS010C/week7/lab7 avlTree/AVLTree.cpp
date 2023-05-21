@@ -67,8 +67,7 @@ void AVLTree::insert(const string &newKey)
     }
     //fix imbalance that the insertion caused
     Node *unbalancedNode = findUnbalancedNode(curr);
-    if (unbalancedNode == nullptr) return;
-    rotate(unbalancedNode, newKey);
+    if (unbalancedNode != nullptr) rotate(unbalancedNode, newKey);
 }
 
 //rotates the subtree based on the type of imbalance
@@ -155,9 +154,11 @@ void AVLTree::printBalanceFactors(Node *curr) const
 //Find and return the closest unbalanced node (with balance factor of 2 or -2) to the inserted node.
 Node *AVLTree::findUnbalancedNode(Node *curr) const
 {
+    //searches for nearest unbalanced node
     while (curr != nullptr)
     {
-        if (abs(balanceFactor(curr)) > 1) return curr; //found imbalance
+        bool notBalanced = abs(balanceFactor(curr)) > 1;
+        if (notBalanced) return curr;
         curr = curr->parent;
     }
     return nullptr; //if all the nodes are balanced
@@ -186,9 +187,11 @@ Node *AVLTree::rotateLeft(Node *input)
     //connect rest of nodes
     newRoot->parent = parent;
     input->parent = newRoot;
+    
     input->right = newRoot->left;
     if (input->right != nullptr) input->right->parent = input; //newRoot may or may not have had a left child
     newRoot->left = input;
+    
     return newRoot;
 }
 
@@ -215,9 +218,11 @@ Node *AVLTree::rotateRight(Node *input)
     //connect the rest of the nodes
     newRoot->parent = parent;
     input->parent = newRoot;
+
     input->left = newRoot->right;
-    if (input->left != nullptr) input->left->parent = input; //newRoot may or may not have had a right child
+    if (input->left != nullptr) input->left->parent = input; //newRoot may or may not have had a right child 
     newRoot->right = input;
+    
     return newRoot;
 }
 
@@ -225,10 +230,11 @@ Node *AVLTree::rotateRight(Node *input)
 int AVLTree::height(Node *curr) const
 {
     if (curr == nullptr) return -1; //base case: end of path reached
-    int leftHeight = height(curr->left);
-    int rightHeight = height(curr->right);
-    return max(leftHeight, rightHeight) + 1; //return largest height between children
+    return max(height(curr->left), height(curr->right)) + 1; //return largest height between children
 }
+
+
+/* Functions below this line are just for the visualization */
 
 // Generates dotty file and visualize the tree using dotty program
 void AVLTree::visualizeTree(const string &outputFilename) const
