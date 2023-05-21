@@ -75,7 +75,7 @@ void AVLTree::insert(const string &newKey)
 //returns new root of the subtree
 Node *AVLTree::rotate(Node *input, const string &key)
 {
-    AVLTree::imbalanceType rotationCase = rotateCase(input, key);
+    imbalanceType rotationCase = rotateCase(input, key);
     if (rotationCase == LL)
     {
         return rotateRight(input);
@@ -98,7 +98,7 @@ Node *AVLTree::rotate(Node *input, const string &key)
 }
 
 //returns a enum indicating the rotation that should be performed on the subtree
-AVLTree::imbalanceType AVLTree::rotateCase(Node *input, const string &key) const
+imbalanceType AVLTree::rotateCase(Node *input, const string &key) const
 {
     int inputBalanceFactor = balanceFactor(input);
     bool leftHeavy = inputBalanceFactor > 1;

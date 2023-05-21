@@ -4,6 +4,8 @@
 
 #include "Node.h"
 
+enum imbalanceType {RR, LL, RL, LR};
+
 class AVLTree
 {
     private:
@@ -22,7 +24,6 @@ class AVLTree
         AVLTree operator=(const AVLTree &);
         AVLTree(const AVLTree &);
         //helpers
-        enum imbalanceType {RR, LL, RL, LR};
         imbalanceType rotateCase(Node *, const std::string &) const;
         void burnTree(Node *);
         Node *findUnbalancedNode(Node *) const;
