@@ -26,18 +26,16 @@ HashTable::~HashTable()
  */
 int HashTable::computeHash(const string &s) const
 {
-    //takes sum of ascii values in string
     int sum = 0;
+	int position = 1;
+	//sum all characters in a string
     for (auto ch : s)
     {
-        sum += static_cast<int>(ch);
+		//multiplying char by its position so that we get a different hash for strings with the same chars in different order
+        sum += static_cast<int>(ch) * position;
+		position++;
     }
-    /* 
-        With an 8000 line dataset, the hash table is bound to be very large.
-        This means that the hash would not cover the whole range of the table assuming we just
-        return (sum of ascii values in word) % (size of array) because the average word is not that large.
-        I am squaring the sum to make sure the whole range is properly accounted for
-    */
+	//squaring the sum so that the whole range of the (probably very large) array is accounted for
     return (sum * sum) % size;
 }
 
