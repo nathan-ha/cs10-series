@@ -4,9 +4,13 @@
 #include <string>
 #include <list>
 #include <iostream>
-#include "WordEntry.h"
+#include <iostream>
+#include <fstream>
+#include <cstdlib>
 
 using namespace std;
+
+#include "WordEntry.h"
 
 class HashTable
 {
@@ -26,5 +30,4 @@ private:
 	HashTable operator=(const HashTable &);
 	int computeHash(const string &) const;
 };
-
 #endif
