@@ -7,15 +7,15 @@
  *  initialize array of lists of WordEntry
  */
 HashTable::HashTable(int s)
-    : hashTable(new list<WordEntry>[s]),
-      size(s)
+	: hashTable(new list<WordEntry>[s]),
+	  size(s)
 {
 }
 
 HashTable::~HashTable()
 {
-    delete[] hashTable;
-    hashTable = nullptr;
+	delete[] hashTable;
+	hashTable = nullptr;
 }
 
 /* computeHash
@@ -26,17 +26,17 @@ HashTable::~HashTable()
  */
 int HashTable::computeHash(const string &s) const
 {
-    int sum = 0;
+	int sum = 0;
 	int position = 1;
-	//sum all characters in a string
-    for (auto ch : s)
-    {
-		//multiplying char by its position so that we get a different hash for strings with the same chars in different order
-        sum += static_cast<int>(ch) * position;
+	// sum all characters in a string
+	for (auto ch : s)
+	{
+		// multiplying char by its position so that we get a different hash for strings with the same chars in different order
+		sum += static_cast<int>(ch) * position;
 		position++;
-    }
-	//squaring the sum so that the whole range of the (probably very large) array is accounted for
-    return (sum * sum) % size;
+	}
+	// squaring the sum so that the whole range of the (probably very large) array is accounted for
+	return (sum * sum) % size;
 }
 
 /* put
@@ -48,21 +48,21 @@ int HashTable::computeHash(const string &s) const
  */
 void HashTable::put(const string &s, int score)
 {
-    //search for location of list containing string
-    int targetIndex = computeHash(s);
-    auto &targetList = hashTable[targetIndex];  //found array where data should be
-    //search list for word
-    for (auto &entry : targetList)
-    {
-        if (entry.getWord() == s)
-        {
-            //in case the word is already in the list
-            entry.addNewAppearance(score);
-            return;
-        }
-    }
-    //if word wasn't found, add it to the list
-    targetList.push_back(WordEntry(s, score));
+	// search for location of list containing string
+	int targetIndex = computeHash(s);
+	auto &targetList = hashTable[targetIndex]; // found array where data should be
+	// search list for word
+	for (auto &entry : targetList)
+	{
+		if (entry.getWord() == s)
+		{
+			// in case the word is already in the list
+			entry.addNewAppearance(score);
+			return;
+		}
+	}
+	// if word wasn't found, add it to the list
+	targetList.push_back(WordEntry(s, score));
 }
 
 /* getAverage
@@ -75,16 +75,16 @@ void HashTable::put(const string &s, int score)
  */
 double HashTable::getAverage(const string &s) const
 {
-    //search for location of list containing string
-    int targetIndex = computeHash(s);
-    auto &targetList = hashTable[targetIndex];
-    //search list for word
-    for (const auto &entry : targetList)
-    {
-        //found the word
-        if (entry.getWord() == s) return entry.getAverage();
-    }
-    return 2.0;
+	// search for location of list containing string
+	int targetIndex = computeHash(s);
+	auto &targetList = hashTable[targetIndex];
+	// search list for word
+	for (const auto &entry : targetList)
+	{
+		// found the word
+		if (entry.getWord() == s) return entry.getAverage();
+	}
+	return 2.0;
 }
 
 /* contains
@@ -94,19 +94,19 @@ double HashTable::getAverage(const string &s) const
  */
 bool HashTable::contains(const string &s) const
 {
-    //search for location of list containing string
-    int targetIndex = computeHash(s);
-    auto &targetList = hashTable[targetIndex];
-    //search list for word
-    for (const auto &entry : targetList)
-    {
-        //found word
-        if (entry.getWord() == s) return true;
-    }
-    return false;
+	// search for location of list containing string
+	int targetIndex = computeHash(s);
+	auto &targetList = hashTable[targetIndex];
+	// search list for word
+	for (const auto &entry : targetList)
+	{
+		// found word
+		if (entry.getWord() == s) return true;
+	}
+	return false;
 }
 
-//putting main here because zybooks doesn't let me submit a main.cpp
+// putting main here because zybooks doesn't let me submit a main.cpp
 int main()
 {
 	// declare a few needed variables for inputing the data
@@ -206,4 +206,3 @@ int main()
 	}
 	return 0;
 }
-
