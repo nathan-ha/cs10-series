@@ -110,7 +110,7 @@ void InsertionSort(int numbers[], int numbersSize)
     Sorts the given array in the range from i to k using quicksort method.
     In this function, pivot is the midpoint element (numbers[(i+k)/2]).
 */
-void Quicksort_midpoint(int numbers[], int low, int high)
+void Quicksort_midpoint(int numbers[], int low = 0, int high = NUMBERS_SIZE - 1)
 {
     if (low >= high) return;
 
@@ -124,7 +124,7 @@ void Quicksort_midpoint(int numbers[], int low, int high)
     The pivot is the median of the following three values:
         leftmost (numbers[i]), midpoint (numbers[(i+k)/2]) and rightmost (numbers[k]).
 */
-void Quicksort_medianOfThree(int numbers[], int low, int high)
+void Quicksort_medianOfThree(int numbers[], int low = 0, int high = NUMBERS_SIZE - 1)
 {
     if (low >= high) return;
 
