@@ -28,7 +28,7 @@ int Jug::solve(string &solution) const
     bool validCapacities = (0 < capacityA_ && capacityA_ <= capacityB_) && 
                            (n_ <= capacityB_ && capacityB_ <= 1000);
 
-    if (!validCosts && !validCapacities) return -1;
+    if (!validCosts || !validCapacities) return -1;
 
     throw runtime_error("finish solve");
 }

@@ -113,7 +113,6 @@ void InsertionSort(int numbers[], int numbersSize)
 void Quicksort_midpoint(int numbers[], int low = 0, int high = NUMBERS_SIZE - 1)
 {
     if (low >= high) return;
-
     int lowPartitionHigh = Partition(numbers, low, high, false);
     Quicksort_midpoint(numbers, low, lowPartitionHigh);
     Quicksort_midpoint(numbers, lowPartitionHigh + 1, high);
@@ -127,14 +126,13 @@ void Quicksort_midpoint(int numbers[], int low = 0, int high = NUMBERS_SIZE - 1)
 void Quicksort_medianOfThree(int numbers[], int low = 0, int high = NUMBERS_SIZE - 1)
 {
     if (low >= high) return;
-
     int lowPartitionHigh = Partition(numbers, low, high, true);
     Quicksort_midpoint(numbers, low, lowPartitionHigh);
     Quicksort_midpoint(numbers, lowPartitionHigh + 1, high);
 }
 
 /*
-    Partitions array and is used in quicksort.
+    Partitions array into low and high partitions. Used in quicksort.
     Returns the highest index of the low partition.
 */
 int Partition(int numbers[], int low, int high, bool usesMedianOfThree)
@@ -147,7 +145,7 @@ int Partition(int numbers[], int low, int high, bool usesMedianOfThree)
         // uses actual black magic
         pivot = max(min(numbers[low], numbers[pivotIndex]), min(max(numbers[low], numbers[pivotIndex]), numbers[high]));
     }
-    while (true)
+    for (;;)
     {
         while (numbers[low] < pivot)
         {
@@ -160,9 +158,9 @@ int Partition(int numbers[], int low, int high, bool usesMedianOfThree)
         // this is true when all elements are partitioned (0 or 1 elements remain)
         if (low >= high)
         {
-            break;
+            return high;
         }
-        //swaps numbers at low and high index
+        //elements smaller than pivot will be on the left, larger on the right
         int swapHolder = numbers[low];
         numbers[low] = numbers[high];
         numbers[high] = swapHolder;
@@ -170,5 +168,5 @@ int Partition(int numbers[], int low, int high, bool usesMedianOfThree)
         low++;
         high--;
     }
-    return high;
+    throw runtime_error("partition: something went horribly wrong");
 }
