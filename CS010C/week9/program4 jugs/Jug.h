@@ -1,7 +1,9 @@
 #pragma once
 #include <string>
+#include <vector>
 
 using std::string;
+using std::vector;
 
 /*
     A problem is given by (Ca, Cb, N, cfA, cfB, ceA, ceB, cpAB, cpBA), where
@@ -11,8 +13,8 @@ using std::string;
     cfB is the cost to fill B,
     ceA, is the cost to empty A,
     ceB is the cost to empty B,
-    cpAB is the cost to pour A to B and c
-    pBA is the cost to pour B to A.
+    cpAB is the cost to pour A to B and
+    cpBA is the cost to pour B to A.
     A solution is a sequence of steps that leaves jug A empty, and exactly N gallons in jug B
 
     The possible steps are:
@@ -28,14 +30,28 @@ using std::string;
 class Jug
 {
 private:
-    int capacityA_, capacityB_;
-    int n_;
-    int cfA_, cfB_;
-    int ceA_, ceB_;
-    int cpAB_, cpBA_;
+    struct jugState
+    {
+        int id;
+        int cost;
+    };
+    struct vertex
+    {
+        int amountA;
+        int amountB;
+        int id;
+        vector<int> newStateAfterAction; // adjacency list
+        vertex(int amountA, int amountB, int id) : amountA(amountA), amountB(amountB), id(id), newStateAfterAction(6, -1) {}
+    };
+    int capacityA, capacityB;
+    int goal;
+    int costToFillA, costToFillB;
+    int costToEmptyA, costToEmptyB;
+    int costToPourAB, costToPourBA;
+    vector<vertex> graph;
+
 public:
     Jug(int, int, int, int, int, int, int, int, int);
-    ~Jug();
 
     // solve is used to check input and find the solution if one exists
     // returns -1 if invalid inputs. solution set to empty string.
@@ -44,5 +60,14 @@ public:
     int solve(string &solution) const;
 
 private:
-    // anything else you need
+    // returns the id of the jug with the specified amounts
+    // if this combination does not exist, it will be added to the list of unfinished vertices
+    int getID(int amountA, int amountB, vector<int> &unfinishedVertices);
+
+    // Display the graph in readable form
+    void printGraph();
+    
+    // Helper for printGraph
+    void showState(int i);
+
 };
