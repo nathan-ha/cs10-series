@@ -30,17 +30,19 @@ using std::vector;
 class Jug
 {
 private:
-    struct jugState
-    {
-        int id;
-        int cost;
-    };
     struct vertex
     {
         int amountA;
         int amountB;
         int id;
-        vector<int> newStateAfterAction; // adjacency list
+
+        struct edge 
+        {
+            int id; //id of the destination
+            int cost;
+            edge(int id = -1, int cost = 0) : id(id), cost(cost) {}
+        };
+        vector<edge> newStateAfterAction; // adjacency list
         vertex(int amountA, int amountB, int id) : amountA(amountA), amountB(amountB), id(id), newStateAfterAction(6, -1) {}
     };
     int capacityA, capacityB;
@@ -63,6 +65,9 @@ private:
     // returns the id of the jug with the specified amounts
     // if this combination does not exist, it will be added to the list of unfinished vertices
     int getID(int amountA, int amountB, vector<int> &unfinishedVertices);
+
+    // returns the action which yields the lowest cost
+    int findMinCost(int vertexID) const;
 
     // Display the graph in readable form
     void printGraph();
