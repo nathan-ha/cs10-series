@@ -73,7 +73,7 @@ int genRandInt(int low, int high)
     return low + rand() % (high - low + 1);
 }
 
-// fills three arrays
+// fills three arrays with random numbers
 void fillArrays(int arr1[], int arr2[], int arr3[])
 {
     for (int i = 0; i < NUMBERS_SIZE; ++i)
@@ -160,7 +160,7 @@ int Partition(int numbers[], int low, int high, bool usesMedianOfThree)
         {
             return high;
         }
-        //elements smaller than pivot will be on the left, larger on the right
+        // swap so elements smaller than pivot will be on the left, larger on the right (slightly more sorted)
         int swapHolder = numbers[low];
         numbers[low] = numbers[high];
         numbers[high] = swapHolder;
