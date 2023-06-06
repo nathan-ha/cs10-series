@@ -1,10 +1,14 @@
 #include <stdexcept>
 #include <iostream>
-#include <limits>
+#include <climits>
+#include <stack>
+#include <vector>
+
 
 
 using std::cout;
 using std::endl;
+using std::vector;
 
 
 #include "Jug.h"
@@ -58,8 +62,13 @@ Jug::Jug(int Ca, int Cb, int N, int cfA, int cfB, int ceA, int ceB, int cpAB, in
         currVertex.newStateAfterAction[5].id = afterPourBA;
         // note: getID pushes any (currently) nonexistent vertices onto the graph
 
-        // assuming each action costs the same, no matter how much water you pour
-        //TODO: is this assumption valid?
+        currVertex.newStateAfterAction[0].path = FILL_A;
+        currVertex.newStateAfterAction[1].path = FILL_B;
+        currVertex.newStateAfterAction[2].path = EMPTY_A;
+        currVertex.newStateAfterAction[3].path = EMPTY_B;
+        currVertex.newStateAfterAction[4].path = POUR_AB;
+        currVertex.newStateAfterAction[5].path = POUR_BA;
+
         currVertex.newStateAfterAction[0].cost = costToFillA;
         currVertex.newStateAfterAction[1].cost = costToFillB;
         currVertex.newStateAfterAction[2].cost = costToEmptyA;
@@ -112,7 +121,7 @@ int Jug::solve(string &solution) const
     for (const auto &currVertex : graph)
     {
         //found desired state
-        if (currVertex.amountB == goal)
+        if (currVertex.amountB == goal || currVertex.amountA == goal)
         {
             targetID = currVertex.id;
         }
@@ -125,34 +134,96 @@ int Jug::solve(string &solution) const
     }
     //searching for shortest path   
     vector<int> unvisitedVertexIDs;
-    vector<int> costs(graph.size(), INT_MAX - 1000); //stores the cost to get to each vertex, subtracting 1000 to prevent weird overflow behavior
+    vector<int> costs(graph.size(), INT_MAX / 2); //stores the cost to get to each vertex, dividing by 2 to prevent weird overflow behavior
     vector<int> predecessorIDs(graph.size(), -1);
     for (unsigned i = 0; i < graph.size(); i++)
     {
         unvisitedVertexIDs.push_back(static_cast<int>(i)); // all the ids are just the index of the vector
     }
-    costs[0] = 0; // start vertex will be the first element
 
+
+    costs.back() = 0; // start vertex will be the last element
+
+    std::stack<string> actions;
+    int costTotal = 0;
     while (unvisitedVertexIDs.size() != 0)
     {
         //visit vertex with minimum distance from start
-        int currVertexID = findMinCost(0);
+        int currVertexID = findMinCost(unvisitedVertexIDs.back());
         const vertex &currV = graph[currVertexID];
-        for (unsigned i = 0; i < currV.newStateAfterAction.size(); i++)
+
+
+        for (unsigned i = currV.newStateAfterAction.size(); i > 0; i--)
         {
-            const auto &adjacentV = currV.newStateAfterAction[i];
+            const vertex::edge &adjacentV = currV.newStateAfterAction[i - 1];
+
             int edgeWeight = adjacentV.cost;
-            int altCost = costs[currVertexID] + edgeWeight;
+            int altCost = edgeWeight + costs[unvisitedVertexIDs.back()];
             // If shorter path from startV to adjV is found,
             // update adjV's distance and predecessor
-            if (altCost < costs[i])
+            if (altCost < costs[i - 1])
             {
-                solution += "action"; //TODO: add actions to each edge
-                costs[i] = altCost;
+                actions.push(getAction(adjacentV)); // dijkstras gives the path in reverse order, so we use a stack to reverse it
+                costs[i - 1] = altCost;
+                costTotal += edgeWeight;
             }
         }
+        //removes the vertex from the unvisited list
+        unvisitedVertexIDs.pop_back();
+    }
+    while (actions.size() > 0)
+    {
+        solution += actions.top();
+        actions.pop();
     }
 
+    solution += "success " + std::to_string(costTotal) + "\n";
+
+    return 1;
+
+}
+
+//returns cost to get to an adjacent vertex
+int Jug::costFrom(int startID, int endID) const
+{
+    const vertex &startV = graph[startID];
+    for (const auto adjV : startV.newStateAfterAction)
+    {
+        if (adjV.id == endID)
+        {
+            return adjV.cost;
+        }
+    }
+    throw std::runtime_error("costFrom: start and end are not adjacent");
+}
+
+string Jug::getAction(const vertex::edge &state) const
+{
+    if (state.path == FILL_A)
+    {
+        return "fill A\n";
+    }
+    if (state.path == FILL_B)
+    {
+        return "fill B\n";
+    }
+    if (state.path == EMPTY_A)
+    {
+        return "empty A\n";
+    }
+    if (state.path == EMPTY_B)
+    {
+        return "empty B\n";
+    }
+    if (state.path == POUR_AB)
+    {
+        return "pour A B\n";
+    }
+    if (state.path == POUR_BA)
+    {
+        return "pour B A\n";
+    }
+    throw std::runtime_error("getAction: something went wrong");
 }
 
 // returns the action which yields the lowest cost
@@ -171,6 +242,8 @@ int Jug::findMinCost(int vertexID) const
     }
     return minCostID;
 }
+
+
 
 // Helper for printGraph
 void Jug::showState(int i)

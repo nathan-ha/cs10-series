@@ -26,6 +26,7 @@ using std::vector;
         pour B A
         success X
 */
+enum action {FILL_A, FILL_B, EMPTY_A, EMPTY_B, POUR_AB, POUR_BA};
 
 class Jug
 {
@@ -39,6 +40,7 @@ private:
         struct edge 
         {
             int id; //id of the destination
+            action path;
             int cost;
             edge(int id = -1, int cost = 0) : id(id), cost(cost) {}
         };
@@ -74,5 +76,11 @@ private:
     
     // Helper for printGraph
     void showState(int i);
+
+    // returns the action which led to the state
+    string getAction(const vertex::edge &state) const;
+
+    // returns cost to get to an adjacent vertex
+    int costFrom(int startID, int endID) const;
 
 };
