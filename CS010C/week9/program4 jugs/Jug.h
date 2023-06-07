@@ -26,24 +26,26 @@ using std::vector;
         pour B A
         success X
 */
-enum action {FILL_A, FILL_B, EMPTY_A, EMPTY_B, POUR_AB, POUR_BA};
+enum action {FILL_A, FILL_B, EMPTY_A, EMPTY_B, POUR_AB, POUR_BA, NONE};
 
 class Jug
 {
+    friend struct compare;
+    
 private:
+    struct edge 
+    {
+        int startID;
+        int endID;
+        int weight;
+        action path;
+        edge(int startID = -1, int endID = -1, int weight = 99999, action path = NONE) : startID(startID), endID(endID), weight(weight), path(path) {}
+    };
     struct vertex
     {
         int amountA;
         int amountB;
         int id;
-
-        struct edge 
-        {
-            int id; //id of the destination
-            action path;
-            int cost;
-            edge(int id = -1, int cost = 0) : id(id), cost(cost) {}
-        };
         vector<edge> newStateAfterAction; // adjacency list
         vertex(int amountA, int amountB, int id) : amountA(amountA), amountB(amountB), id(id), newStateAfterAction(6, -1) {}
     };
@@ -68,19 +70,21 @@ private:
     // if this combination does not exist, it will be added to the list of unfinished vertices
     int getID(int amountA, int amountB, vector<int> &unfinishedVertices);
 
-    // returns the action which yields the lowest cost
-    int findMinCost(int vertexID) const;
-
     // Display the graph in readable form
     void printGraph();
     
     // Helper for printGraph
     void showState(int i);
 
-    // returns the action which led to the state
-    string getAction(const vertex::edge &state) const;
+    // returns a string based on the action that made the edge
+    string getAction(const edge &state) const;
+};
 
-    // returns cost to get to an adjacent vertex
-    int costFrom(int startID, int endID) const;
-
+// used to make the stl priority queue into a min queue
+struct compare
+{
+    bool operator()(const Jug::edge* lhs, const Jug::edge* rhs)
+    {
+        return lhs->weight > rhs->weight;
+    }
 };
