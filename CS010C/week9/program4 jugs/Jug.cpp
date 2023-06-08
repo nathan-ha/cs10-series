@@ -4,15 +4,12 @@
 #include <stack>
 #include <vector>
 #include <queue>
-#include <set>
 
 using std::cout;
 using std::endl;
 using std::vector;
 using std::queue;
 using std::stack;
-using std::priority_queue;
-using std::set;
 
 #include "Jug.h"
 
