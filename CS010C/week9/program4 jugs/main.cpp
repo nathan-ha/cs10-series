@@ -25,4 +25,14 @@ int main()
         }
         cout << solution << endl;
     }
+    {
+        cout << endl;
+        string solution;
+        Jug head(247, 501, 30 , 1, 1, 1, 1, 1, 1);
+        if (head.solve(solution) != 1)
+        {
+            cout << "Error 3" << endl;
+        }
+        cout << solution << endl;
+    }
 }

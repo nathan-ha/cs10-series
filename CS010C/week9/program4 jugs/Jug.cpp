@@ -4,6 +4,7 @@
 #include <stack>
 #include <vector>
 #include <queue>
+#include <set>
 
 using std::cout;
 using std::endl;
@@ -11,6 +12,7 @@ using std::vector;
 using std::queue;
 using std::stack;
 using std::priority_queue;
+using std::set;
 
 #include "Jug.h"
 
@@ -25,27 +27,24 @@ Jug::Jug(int Ca, int Cb, int N, int cfA, int cfB, int ceA, int ceB, int cpAB, in
       costToPourAB(cpAB),
       costToPourBA(cpBA)
 {
+    bool validCosts = (costToFillA > 0) &&
+                          (costToFillB > 0) &&
+                          (costToEmptyA > 0) &&
+                          (costToEmptyB > 0) &&
+                          (costToPourAB > 0) &&
+                          (costToPourBA > 0);
+    bool validCapacities = (0 < capacityA && capacityA <= capacityB) &&
+                            (goal <= capacityB && capacityB <= 1000);
+    if (!validCosts || !validCapacities) return;
+
     vector<int> unfinishedVertices;
-    // add empty vertex to start
+    // start vertex will be both 0 amounts
     unfinishedVertices.push_back(0);
     graph.push_back(vertex(0, 0, 0));
 
     // records the state of each jug after every action
     while (unfinishedVertices.size() > 0)
     {
-        bool validCosts = (costToFillA > 0) &&
-                          (costToFillB > 0) &&
-                          (costToEmptyA > 0) &&
-                          (costToEmptyB > 0) &&
-                          (costToPourAB > 0) &&
-                          (costToPourBA > 0);
-         bool validCapacities = (0 < capacityA && capacityA <= capacityB) &&
-                                (goal <= capacityB && capacityB <= 1000);
-        if (!validCosts || !validCapacities)
-        {
-            return;
-        }
-
         int id = unfinishedVertices.back();
         unfinishedVertices.pop_back();
         int currAmountA = graph[id].amountA;
@@ -76,7 +75,6 @@ Jug::Jug(int Ca, int Cb, int N, int cfA, int cfB, int ceA, int ceB, int cpAB, in
         currVertex.newStateAfterAction[5] = edge(id, afterPourBA, costToPourBA, POUR_BA);
         // note: getID pushes any (currently) nonexistent vertices onto the graph
     }
-    // printGraph();
 }
 
 // returns the id of the jug with the specified amounts
@@ -94,12 +92,11 @@ int Jug::getID(int amountA, int amountB, vector<int> &unfinishedVertices)
     return id;
 }
 
-//TODO: make more efficient, add comments
-
 // solve is used to check input and find the solution if one exists
 // returns -1 if invalid inputs. solution set to empty string.
 // returns 0 if inputs are valid but a solution does not exist. solution set to empty string.
 // returns 1 if solution is found and stores solution steps in solution string.
+// uses dijkstras algorithm to find best way to fill jugs
 int Jug::solve(string &solution) const
 {
     bool validCosts = (costToFillA > 0) &&
@@ -118,10 +115,9 @@ int Jug::solve(string &solution) const
     }
 
     int targetID = -1;
-    //plan: find solution if it exists, then trace path to it
+    // looking for desired state
     for (const auto &currVertex : graph)
     {
-        //found desired state
         if (currVertex.amountB == goal || currVertex.amountA == goal)
         {
             targetID = currVertex.id; //assuming only one solution exists at a time
@@ -134,107 +130,111 @@ int Jug::solve(string &solution) const
         return 0;
     } 
 
-    vector<edge> nodes;
+    // starting actual solving
+    vector<edge> edges;
+    vector<bool> visited(graph.size(), false);
     for (unsigned i = 0; i < graph.size(); i++)
     {
-        nodes.push_back(edge(-1, i, INT_MAX / 2, NONE));
+        edges.push_back(edge(-1, i, INT_MAX / 2, NONE));
     }
+
+    queue<edge*> unvisitedQueue;
     //starting from empty jugs (0,0)
-    nodes[0].weight = 0;
-
-    priority_queue<edge*, vector<edge*>, compare> unvisitedQueue; // using a priority queue to visit adjacent nodes in order
-    // add each vertex into the unvisited queue
-    for (unsigned i = 0; i < graph.size(); i++)
+    edges[0].weight = 0;
+    visited[0] = true;
+    // initial push to unvisited queue
+    for (const auto &adjNode : graph[0].newStateAfterAction)
     {
-        for (const auto &adjNode : graph[i].newStateAfterAction)
-        {
-            unvisitedQueue.push(&nodes[adjNode.endID]);   
-        }
-    }  
-
+        unvisitedQueue.push(&edges[adjNode.endID]);
+    }
 
     while (unvisitedQueue.size() > 0)
     {
-        edge currV = *unvisitedQueue.top();
-        //visit vertex with minimum distance from start
-        queue<edge> newStateNodes;
-        for (const auto &adjNode : graph[currV.endID].newStateAfterAction)
+        edge *currEdge = unvisitedQueue.front();
+        // add adjacent nodes to a queue
+        queue<edge> newStateNodes; // "new state nodes" is synonymous to "adjacent nodes"
+        for (const auto &adjNode : graph[currEdge->endID].newStateAfterAction)
         {
-            newStateNodes.push(edge(currV.endID, adjNode.endID, adjNode.weight, adjNode.path));
+            newStateNodes.push(edge(currEdge->endID, adjNode.endID, adjNode.weight, adjNode.path));
         }
-        // for every node adjacent to currV...
+        // for every node adjacent to currEdge...
         while (newStateNodes.size() > 0)
         {
             const auto &adjV = newStateNodes.front();
-            int edgeWeight = adjV.weight;
-            int altWeight = edgeWeight + nodes[currV.endID].weight;
-            if (altWeight < nodes[adjV.endID].weight)
+            // add adjacent nodes to unvisited queue
+            for (const auto &adjNode : graph[adjV.endID].newStateAfterAction)
             {
-                nodes[adjV.endID].weight = altWeight;
-                nodes[adjV.endID].startID = currV.endID;
-                nodes[adjV.endID].path = adjV.path;
+                if (visited[adjNode.endID] == false)
+                {
+                    visited[adjNode.endID] = true;
+                    unvisitedQueue.push(&edges[adjNode.endID]);
+                }
+            }
+            // update edge info if better path was changed
+            int edgeWeight = adjV.weight;
+            int altWeight = edgeWeight + edges[currEdge->endID].weight;
+            if (altWeight < edges[adjV.endID].weight)
+            {
+                edges[adjV.endID].weight = altWeight;
+                edges[adjV.endID].startID = currEdge->endID;
+                edges[adjV.endID].path = adjV.path;
+                visited[adjV.endID] = true;
             }
             newStateNodes.pop();
         }
         unvisitedQueue.pop();
     }
 
-    int totalCost = 0;
+    // using a stack because we are starting at the end, and backtracking to the beginning
     stack<edge*> shortestPath;
-    // go backwards through graph
-    for (int i = targetID; i != 0; i = nodes[i].startID)
+    for (int i = targetID; i != 0; i = edges[i].startID)
     {
-        shortestPath.push(&nodes[i]);
+        shortestPath.push(&edges[i]);
     }
-
+    int totalCost = 0;
     while (shortestPath.size() > 0)
     {
-        auto currV = *shortestPath.top();
-        solution += getAction(currV);
-        totalCost = currV.weight;
+        auto currEdge = *shortestPath.top();
+        solution += getAction(currEdge);
+        totalCost = currEdge.weight;
         shortestPath.pop();
-    }
-    
+    } 
     solution += "success " + std::to_string(totalCost);
-
     return 1;
 }
 
 // returns a string based on the action that made the edge
-string Jug::getAction(const edge &state) const
+string Jug::getAction(const edge &edge) const
 {
-    if (state.path == FILL_A)
+    if (edge.path == FILL_A)
     {
         return "fill A\n";
     }
-    if (state.path == FILL_B)
+    if (edge.path == FILL_B)
     {
         return "fill B\n";
     }
-    if (state.path == EMPTY_A)
+    if (edge.path == EMPTY_A)
     {
         return "empty A\n";
     }
-    if (state.path == EMPTY_B)
+    if (edge.path == EMPTY_B)
     {
         return "empty B\n";
     }
-    if (state.path == POUR_AB)
+    if (edge.path == POUR_AB)
     {
         return "pour A B\n";
     }
-    if (state.path == POUR_BA)
+    if (edge.path == POUR_BA)
     {
         return "pour B A\n";
     }
     throw std::runtime_error("getAction: something went wrong");
 }
 
-
-
-
 // Helper for printGraph
-void Jug::showState(int i)
+void Jug::showState(int i) const
 {
     cout << '\t' << i;
     if (i != -1)
@@ -243,19 +243,24 @@ void Jug::showState(int i)
     }
 }
 
-// // Display the graph in readable form
-// void Jug::printGraph()
-// {
-//     cout << "ID\t(A,B)\tfillA\tfillB\temptyA\temptyB\tpourAB\tpourBA" << endl;
-//     for (const auto &v : graph)
-//     {
-//         cout << v.id << "\t(" << v.amountA << ',' << v.amountB << ")";
-//         showState(v.newStateAfterAction[0]);
-//         showState(v.newStateAfterAction[1]);
-//         showState(v.newStateAfterAction[2]);
-//         showState(v.newStateAfterAction[3]);
-//         showState(v.newStateAfterAction[4]);
-//         showState(v.newStateAfterAction[5]);
-//         cout << endl;
-//     }
-// }
+// Display the graph in readable form
+void Jug::printGraph() const
+{
+    cout << "ID\t(A,B)\tfillA\tfillB\temptyA\temptyB\tpourAB\tpourBA" << endl;
+    for (const auto &v : graph)
+    {
+        cout << v.id << "\t(" << v.amountA << ',' << v.amountB << ")";
+        showState(v.newStateAfterAction[0].endID);
+        showState(v.newStateAfterAction[1].endID);
+        showState(v.newStateAfterAction[2].endID);
+        showState(v.newStateAfterAction[3].endID);
+        showState(v.newStateAfterAction[4].endID);
+        showState(v.newStateAfterAction[5].endID);
+        cout << endl;
+    }
+}
+
+Jug::~Jug()
+{
+    // empty destructor because I didn't use "new" at all
+}

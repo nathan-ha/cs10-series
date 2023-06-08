@@ -3,6 +3,27 @@
 
 Heap::Heap(): numItems(0) {}
 
+// void Heap::enqueue(PrintJob* newJob) {
+//     if (numItems == MAX_HEAP_SIZE) return; //edge case: array capacity reached
+//     //append to array
+//     arr[numItems] = newJob;
+//     numItems++;
+//     //"percolate up" until max heap properties is satisfied
+//     int newJobIndex = numItems - 1;
+//     int parentIndex = (newJobIndex - 1) / 2;
+//     while (arr[newJobIndex]->getPriority() > arr[parentIndex]->getPriority()) { //max heap is violated when child is larger than parent
+//         //shift new element through the array until it gets to the right spot
+//         while (newJobIndex > parentIndex) {
+//             //keep swapping newJob, effectively inserting it at its new position
+//             auto temp = arr[newJobIndex];
+//             arr[newJobIndex] = arr[newJobIndex - 1];
+//             arr[newJobIndex - 1] = temp;
+//             newJobIndex--;
+//         }
+//         parentIndex = (newJobIndex - 1) / 2;
+//     }
+// }
+
 void Heap::enqueue(PrintJob* newJob) {
     if (numItems == MAX_HEAP_SIZE) return; //edge case: array capacity reached
     //append to array
@@ -13,16 +34,15 @@ void Heap::enqueue(PrintJob* newJob) {
     int parentIndex = (newJobIndex - 1) / 2;
     while (arr[newJobIndex]->getPriority() > arr[parentIndex]->getPriority()) { //max heap is violated when child is larger than parent
         //shift new element through the array until it gets to the right spot
-        while (newJobIndex > parentIndex) {
-            //keep swapping newJob, effectively inserting it at its new position
-            auto temp = arr[newJobIndex];
-            arr[newJobIndex] = arr[newJobIndex - 1];
-            arr[newJobIndex - 1] = temp;
-            newJobIndex--;
-        }
+        auto swapHolder = arr[newJobIndex];
+        arr[newJobIndex] = arr[parentIndex];
+        arr[parentIndex] = swapHolder;
+        
+        newJobIndex = parentIndex;
         parentIndex = (newJobIndex - 1) / 2;
     }
 }
+
 
 void Heap::trickleDown(int root) {
 
