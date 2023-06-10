@@ -6,12 +6,13 @@ using namespace std;
 const int NUMBERS_SIZE = 50000;
 
 int genRandInt(int low, int high);
-void fillArrays(int arr1[], int arr2[], int arr3[]);
+void fillArrays(int arr1[], int arr2[], int arr3[], int arr4[]);
 
 void Quicksort_midpoint(int numbers[], int low, int high);
 void Quicksort_medianOfThree(int numbers[], int low, int high);
 void InsertionSort(int numbers[], int numbersSize);
 int Partition(int numbers[], int low, int high, bool usesMedianOfThree);
+void bubbleSort(int numbers[], int N);
 
 int main()
 {
@@ -19,7 +20,9 @@ int main()
     int nums1[NUMBERS_SIZE];
     int nums2[NUMBERS_SIZE];
     int nums3[NUMBERS_SIZE];
-    fillArrays(nums1, nums2, nums3);
+    int nums4[NUMBERS_SIZE];
+
+    fillArrays(nums1, nums2, nums3, nums4);
     cout << "testing arrays of size " << NUMBERS_SIZE << '\n';
 
     // testing insertion sort time
@@ -43,7 +46,17 @@ int main()
     elapsedTime = (End - Start) / CLOCKS_PER_MS;
     cout << "Quicksort (median of three) time: " << elapsedTime << "ms\n";
 
+    Start = clock();
+    bubbleSort(nums4, NUMBERS_SIZE);
+    End = clock();
+    elapsedTime = (End - Start) / CLOCKS_PER_MS;
+    cout << "bubble sort time: " << elapsedTime << "ms\n";
+
+
+
     cout << "\ncalling sort on the sorted arrays:\n";
+
+
 
     // testing insertion sort time
     Start = clock();
@@ -65,6 +78,12 @@ int main()
     End = clock();
     elapsedTime = (End - Start) / CLOCKS_PER_MS;
     cout << "Quicksort (median of three) time: " << elapsedTime << "ms\n";
+
+    Start = clock();
+    bubbleSort(nums4, NUMBERS_SIZE);
+    End = clock();
+    elapsedTime = (End - Start) / CLOCKS_PER_MS;
+    cout << "bubble sort time: " << elapsedTime << "ms\n";
 }
 
 // returns a random inclusive int
@@ -74,13 +93,14 @@ int genRandInt(int low, int high)
 }
 
 // fills three arrays with random numbers
-void fillArrays(int arr1[], int arr2[], int arr3[])
+void fillArrays(int arr1[], int arr2[], int arr3[], int arr4[])
 {
     for (int i = 0; i < NUMBERS_SIZE; ++i)
     {
         arr1[i] = genRandInt(0, NUMBERS_SIZE);
         arr2[i] = arr1[i];
         arr3[i] = arr1[i];
+        arr4[i] = arr1[i];
     }
 }
 
@@ -169,4 +189,21 @@ int Partition(int numbers[], int low, int high, bool usesMedianOfThree)
         high--;
     }
     throw runtime_error("partition: something went horribly wrong");
+}
+
+// added later, June 9, 2023
+void bubbleSort(int numbers[], int N)
+{
+    for (int i = 0; i < N - 1; i++)
+    {
+        for (int j = i; j < N - i - 1; j++)
+        {
+            if (numbers[j] > numbers[j + 1])
+            {
+                auto temp = numbers[j];
+                numbers[j] = numbers[j + 1];
+                numbers[j + 1] = temp;
+            }
+        }
+    }
 }
