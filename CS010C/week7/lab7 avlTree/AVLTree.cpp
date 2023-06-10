@@ -189,7 +189,6 @@ Node *AVLTree::rotateLeft(Node *input)
     input->parent = newRoot;
     
     input->right = newRoot->left;
-    if (input->right != nullptr) input->right->parent = input; //newRoot may or may not have had a left child
     newRoot->left = input;
     
     return newRoot;
@@ -220,7 +219,6 @@ Node *AVLTree::rotateRight(Node *input)
     input->parent = newRoot;
 
     input->left = newRoot->right;
-    if (input->left != nullptr) input->left->parent = input; //newRoot may or may not have had a right child 
     newRoot->right = input;
     
     return newRoot;
