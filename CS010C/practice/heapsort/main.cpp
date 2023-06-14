@@ -12,7 +12,7 @@ int main()
 {
 
     // create array of random ints
-    const int size = 10000;
+    const int size = 50000;
     int arr[size];
     for (int i = 0; i < size; i++)
     {
